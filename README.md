@@ -1,6 +1,8 @@
 Just [hojkas], trying to wrap my head around the task. Feel free to add stuff. Feel free to ignore this. Added for the slight chance it could be usefull.
 Toto nemá co dělat s odevzdávkou.
 
+[toc]
+
 # Howto: ICP
 
 snaha rozložit velkou neznámou kterou je projekt na podproblémy
@@ -96,6 +98,54 @@ Vytvoření objektů (seznam čar mapy, vytvoření objektů čar).
 Projití seznamu čar bod po bodu, vytvoření objektů na mapě skrz to.
 
 **!** Co měřítko? Zatím neřešit? Nebo už toto všechno řešit v relativním poměru? (Stačí asi v absolutní hodnotě, zbytek se poté dá upravit)
+
+# Maybe important code stuff
+
+## Ladící výpisy
+
+```cpp
+#include <QDebug>
+//sum code
+qDebug << "shit happened" << value;
+```
+
+## Slot/signál
+
+**What for**
+
+Zpracování signálu z různých tlačíteka hejbátek co budou na interface.
+
+**Code**
+
+```cpp
+// example ze streamu
+// mainwindow.h v MainWindow class
+private slots:
+	void onValueChange(int value);
+// mainwindow.cpp v class MainWIndow creatoru (?)
+connect(ui->horizontalSlider, SIGNAL(valueChanged(int)), this, SLOT(onValueChange(int)))
+// samostatna funkce v mainwindow.cpp
+void MainWindow::onValueChange(int val)
+{
+    //what will happen
+}
+//onValueChange je naše jméno funkce, valueChanged je definovaný signál z daného prvku
+```
+
+Jde taky napojit signál na signál.
+
+```cpp
+// .h v classe
+signals:
+	void valChanged(int val);
+// .cpp v kodu
+connect(ui->horizontalSlider, SIGNAL(valueChanged(int)), this, SIGNAL(valChanged(int)));
+// aka to místo napojení na slot co to zpracuje prostě jen změní a pošle jiný signál
+// kdybychom potom chtěli signál použít v té samé classe, slot ofc musí být definovaný viz kód nad tímto
+connect(this, SIGNAL(valChanged(int)), this, SLOT(sumSlot(int)));
+```
+
+**!** aby signály bylo možné využívat, musí být v objektu, který dění z QObject (např. MainWindow to splňuje)
 
 
 
