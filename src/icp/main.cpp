@@ -1,10 +1,3 @@
-/**
- * @file main.cpp
- * @author TODO
- * @brief TODO
- * Additional description TODO
- */
-
 #include "mainwindow.h"
 #include <QApplication>
 
