@@ -1,6 +1,8 @@
 Just [hojkas], trying to wrap my head around the task. Feel free to add stuff. Feel free to ignore this. Added for the slight chance it could be usefull.
 Toto nemá co dělat s odevzdávkou.
 
+http://www.fit.vutbr.cz/study/courses/ICP/public/ICP-PRJ-zadani.html.cs
+
 [toc]
 
 # Howto: ICP
@@ -9,23 +11,13 @@ snaha rozložit velkou neznámou kterou je projekt na podproblémy
 
 by: hojkas the pepega
 
-to: hojkas the pepega
+to: hojkas the pepega and Otterly the flying god
 
 # Overview ideas
-
-Možné rozdělení na moduly:
-
-- General GUI (clock tick, update signals, setup, atd.)
-- Map handler (load map, move map, zoom map)
-- Bus handler (load track, draw current)
 
 ## GUI
 
 Návrh přes QT, to vytvoří samo. Propojení s funkčností samotnou pomocí signálů a socketů...
-
-### Mapa
-
-Ze souboru nahrané body a vykreslené. Hádám že vše bude nějak v souřadnici.
 
 ### Přiblížení/posun věcí
 
@@ -33,53 +25,54 @@ Protože musíme řešit oddalování/přibližování, jednoduchý kód na pře
 
 ## Třídy
 
+**!** Pokud se interaktivně něco mění (objížďka, dopravní situace)…
+
 ### Mapa
 
 Seznam čar.
 
-### Čára
+### Ulice
 
-Informace: bod1, bod2, [název ulice].
+Informace: id, bod1, bod2, [název ulice], čas na projetí v sekundách. (uchováváme i ve file)
+
+Multiplier (default 1). Interaktivně se dá měnit.
 
 ### Zastávka
 
-Objekt. Informace: bod, bod2, [název], poloha k bod (%?).
-
-Nebo jen objekt čáry a případě hodnota polohy? Sounds better.
+není třeba jako objekt, we are lazy, zastávka == polovina ulice
 
 ### Linka
 
-Objekt. Informace: Číslo, zastávka0, čas do další zastávky, zastávka1, ... zastávkaN.
+File: číslo linky, id ulice, zastávka bool
 
-> 45 Z1 2 Z2 3 Z3 1 Z4
+Objekt: čislo linky, oboustranně propojený seznam ulice a jestli je zde zastávka (seznam objekt: ulice + bool).
 
-Aka č. 45 jedoucí ze zastávky1 do Z4 přes Z2 a Z3, čísla mezi jsou minuty. Pouze orientační zápis.
+### Objížďky
+
+Naklikání ulic k ostranění z linky, nový kousek seznamu, napojit, vymazat.
+
+How:
+
+* po dokončení objížky znovu načíst řád z file
+* mít bool a jiný seznam pro objížďkový řád
+
+### Ztížení provozu
+
+Změna multiplieru, když je ulice se stejným jménem víckrát, klidně na všechny.
 
 ### Autobus
 
-Objekt. Informace: Linka které náleží, čas výjezdu, aktuální pozice (null není-li na trati), možná dopočítat čas odstranění z mapy.
+**!** Co opačný směr? (přinejhorším bool na otočení směru)
 
-## Filesystem
+File (v node u linky): výjezdní čas, bool na směr.
 
-Formát? CVS? Json? Something else?
+Objekt: Odkaz na linku (třídu), výjezdní čas, aktuální x, aktuální y (pro výpis), odkaz na ulici, čas co už byl na ulici, bool na směr
 
-Co je potřeba uložit:
+**!** V každém tiku dopočítat aktuální x, y
 
-### Mapa
+### Timer
 
-Aka body a název ulice mezi nimi.
-
-HOWTO implement:
-
-* One way: Vlastní widget classa, event stuff.
-
-### Linky
-
-Číslo, zastávky (ty stylem název ulice? případně nějaký offset jak blízko je to k bodu kraje?) a čas na projetí?
-
-### Jízdní řád
-
-Linka (čas na projetí zde nebo u linky) a časy kdy vyjíždí spoj z které strany?
+Tlačítka na zrychlení/nastavení času, vysílání signálu na aktualizaci
 
 # Howto: Start
 
@@ -110,7 +103,7 @@ Projití seznamu čar bod po bodu, vytvoření objektů na mapě skrz to.
 ```cpp
 #include <QDebug>
 //sum code
-qDebug << "shit happened" << value;
+qDebug() << "shit happened" << value;
 ```
 
 ## Signály + Sloty
