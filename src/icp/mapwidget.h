@@ -16,6 +16,9 @@ class MapWidget : public QWidget
 public:
     explicit MapWidget(QWidget *parent = nullptr);
 
+protected:
+    virtual void paintEvent(QPaintEvent *event) override;
+
 signals:
 
 public slots:

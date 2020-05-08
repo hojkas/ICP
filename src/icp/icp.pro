@@ -26,11 +26,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    mapwidget.cpp
+    mapwidget.cpp \
+    street.cpp
 
 HEADERS += \
         mainwindow.h \
-    mapwidget.h
+    mapwidget.h \
+    street.h
 
 FORMS += \
         mainwindow.ui
