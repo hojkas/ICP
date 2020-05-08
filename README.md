@@ -69,6 +69,10 @@ Co je potřeba uložit:
 
 Aka body a název ulice mezi nimi.
 
+HOWTO implement:
+
+* One way: Vlastní widget classa, event stuff.
+
 ### Linky
 
 Číslo, zastávky (ty stylem název ulice? případně nějaký offset jak blízko je to k bodu kraje?) a čas na projetí?
@@ -109,11 +113,15 @@ Projití seznamu čar bod po bodu, vytvoření objektů na mapě skrz to.
 qDebug << "shit happened" << value;
 ```
 
-## Slot/signál
+## Signály + Sloty
 
 **What for**
 
 Zpracování signálu z různých tlačíteka hejbátek co budou na interface.
+
+Lze použít na timer, který každým tikem vyvolá signál na obnovu mapy. (`QTimer`)
+
+### Chytání signálů
 
 **Code**
 
@@ -132,6 +140,8 @@ void MainWindow::onValueChange(int val)
 //onValueChange je naše jméno funkce, valueChanged je definovaný signál z daného prvku
 ```
 
+### Přesměrování signálu
+
 Jde taky napojit signál na signál.
 
 ```cpp
@@ -145,7 +155,62 @@ connect(ui->horizontalSlider, SIGNAL(valueChanged(int)), this, SIGNAL(valChanged
 connect(this, SIGNAL(valChanged(int)), this, SLOT(sumSlot(int)));
 ```
 
-**!** aby signály bylo možné využívat, musí být v objektu, který dění z QObject (např. MainWindow to splňuje)
+**!** aby signály bylo možné využívat, musí být v objektu, který dědí z QObject (např. MainWindow to splňuje) a zároveň musí mít v .h v definici classy na prvním řádku Q_OBJECT
 
+```cpp
+class MainWindow : public QMainWindow
+{
+    Q_OBJECT
+    //sumShit
+signals:
+    //sumSignalDef
+private slots:
+    //sumSlotDef
+}
+```
 
+### Vysílání signálu
 
+```cpp
+//např. v nějaké funkci/objektu/slotu
+emit valChanged(value);
+// signál valChanged musí být definovaný v .h (viz první Signál code)
+```
+
+## Eventy
+
+Seznam eventů se dá nice najít v helpu pod danou classou (např. QWidget)
+
+```cpp
+//do .h do classy
+//toto copy-paste z help
+protected:
+	virtual void paintEvent(QPaintEvent *event) override;
+//v .cpp
+#include <QPainter>
+void MyWidget::paintEvent(QPaintEvent *event)
+{
+    QPainter p(this);
+    p.drawEllipse(sum_params);
+    //btw event->pos() vrátí pozici eventu, could be usefull?
+}
+```
+
+Když řešíme override, dobré je uvnitř acceptnout event zavolat tu bázovou třídu. (Mohou v ní být extra akce, které by se měly provést pokaždé or something. Accept aby už se nezpracovával, jen třeba aby se zaškrtlo tlačítko, atd. Don’t think about it, do it.)
+
+```cpp
+void MyWidget::mousePressEvent(QMouseEvent *event)
+{
+    //myNonInterestingStuff
+    event->accept();
+    QWidget::mousePressEvent(event);
+}
+```
+
+## Vlastní widget
+
+Vytvořit classu (header, cpp).
+
+V Návrhu dát prostor pro Widget (pod Containers) . Kliknout pravým. “Promote to own something”, tam vyplnit jakou naši třídu tam chceme.
+
+**!** Bacha na includes. Je potřeba toho pro widgety občas dost… `#include <QtWidgets>` většinu zahrnuje.
