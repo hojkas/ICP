@@ -1,3 +1,10 @@
+/**
+ * @file mainwindow.cpp
+ * @author TODO
+ * @brief TODO
+ * Additional description TODO
+ */
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
