@@ -1,10 +1,3 @@
-/**
- * @file mainwindow.h
- * @author TODO
- * @brief TODO
- * Additional description TODO
- */
-
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
