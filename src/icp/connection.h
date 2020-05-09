@@ -2,6 +2,10 @@
 #define CONNECTION_H
 
 #include <QObject>
+#include <QDebug>
+#include <QJsonArray>
+#include <QJsonObject>
+
 
 class connection : public QObject
 {
@@ -12,6 +16,10 @@ public:
 signals:
 
 public slots:
+    void loadConnections();
+
+ private:
+
 };
 
 #endif // CONNECTION_H
