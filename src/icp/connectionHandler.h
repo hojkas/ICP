@@ -8,11 +8,11 @@
 #include <QString>
 
 
-class connection : public QObject
+class connectionHandler : public QObject
 {
     Q_OBJECT
 public:
-    explicit connection(QObject *parent = nullptr);
+    explicit connectionHandler(QObject *parent = nullptr);
 
 signals:
 
@@ -23,10 +23,6 @@ public slots:
 
 };
 
-class stringList{
-public:
-    QString stringVal;
-    stringList *nextElem;
-};
+class c
 
 #endif // CONNECTION_H
