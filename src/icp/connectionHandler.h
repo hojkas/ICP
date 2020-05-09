@@ -13,16 +13,19 @@ class connectionElem
 {
 public:
     QString name;
-    std::list<std::tuple<QString, bool>> streetList;
+    std::list<std::tuple<Street*, bool>> streetList;
 };
 
 class busElem
 {
-    connectionElem con;
-    time_t time;
+public:
+    connectionElem* con;
+    int departure;
+    int sinceDeparture;
     int x;
     int y;
-    Street curStreet;
+    Street* curStreet;
+    bool returning;
 };
 
 class connectionHandler : public QObject
@@ -31,11 +34,13 @@ class connectionHandler : public QObject
 public:
     explicit connectionHandler(QObject *parent = nullptr);
     std::list<connectionElem> conList;
+    std::list<busElem> busList;
 signals:
 
 public slots:
-    void loadConnections();
+    void loadConnections(std::list<Street *> street_list);
     void printConnections();
+    Street* findStreet(int id, std::list<Street*> streetList);
  private:
 
 };
