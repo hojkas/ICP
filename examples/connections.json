@@ -1,28 +1,107 @@
 [
 {
 	"name":"S1",
-	"crossing": [
-		"Kotlarska",
-		"Ujezd",
-		"Prazska",
-		"Ceska"
+	"streets":
+	[
+		{
+			"id": 2,
+            "right_direction": false,
+			"stop": true
+		},
+		{
+			"id": 3,
+            "right_direction":true,
+			"stop": false
+		},
+		{
+            "id": 5,
+            "right_direction":false,
+			"stop":false
+		},
+		{
+            "id": 4,
+            "right_direction":false,
+			"stop": true
+		}
 	],
-	"stops": [
-		"Kotlarska",
-		"Ceska"
+	"buses":
+	[
+		{
+			"time":0,
+			"return":false
+		},
+		{
+			"time":10,
+			"return":false
+		},
+		{
+			"time":20,
+			"return":false
+		},
+		{
+			"time":30,
+			"return":false
+		},
+		{
+			"time":40,
+			"return":false
+		},
+		{
+			"time":50,
+			"return":false
+		}
 	]
 },
 {
 	"name":"S2",
-	"crossing": [
-		"Prazska",
-		"Ujezd",
-		"Kotlarska"
+	"streets":
+	[
+		{
+			"id": 5,
+            "right_direction": true,
+			"stop": true
+		},
+		{
+			"id": 3,
+            "right_direction":false,
+			"stop": true
+		},
+		{
+			"id": 2,
+            "right_direction":true,
+			"stop": true
+		}
 	],
-	"stops":[
-		"Prazska",
-		"Ujezd",
-		"Kotlarska"
+	"buses":
+	[
+		{
+			"time":5,
+			"return":false
+		},
+		{
+			"time":15,
+			"return":false
+		},
+		{
+			"time":25,
+			"return":false
+		},
+		{
+			"time":35,
+			"return":false
+		},
+		{
+			"time":45,
+			"return":false
+		},
+		{
+			"time":55,
+			"return":false
+		},
+		{
+			"time":65,
+			"return":false
+		}
 	]
 }
 ]
