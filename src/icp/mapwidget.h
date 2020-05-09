@@ -12,11 +12,15 @@
 #include <QPainter>
 #include <QDebug>
 
+#include "street.h"
+
 class MapWidget : public QWidget
 {
     Q_OBJECT
 public:
     explicit MapWidget(QWidget *parent = nullptr);
+    ~MapWidget();
+    AllStreets* streets;
 
 protected:
     virtual void paintEvent(QPaintEvent *event) override;

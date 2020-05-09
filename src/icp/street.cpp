@@ -12,7 +12,7 @@ Street::Street(QObject *parent) : QObject(parent)
 
 }
 
-Street::Street(int x_1, int y_1, int x_2, int y_2, int s_id, QString s_name, QObject *parent) : QObject(parent)
+Street::Street(int x_1, int y_1, int x_2, int y_2, int s_id, int s_time, QString s_name, QObject *parent) : QObject(parent)
 {
     x1 = x_1;
     x2 = x_2;
@@ -20,6 +20,7 @@ Street::Street(int x_1, int y_1, int x_2, int y_2, int s_id, QString s_name, QOb
     y2 = y_2;
     id = s_id;
     name = s_name;
+    time = s_time;
     difficulty = 1;
 }
 
@@ -28,6 +29,25 @@ AllStreets::AllStreets(QObject *parent) : QObject(parent)
 
 }
 
+int Street::count_time()
+{
+    return (this->time * this->difficulty);
+}
+
+/*
+ * @brief Destructor to delete all objects referenced in Street* list.
+ */
+AllStreets::~AllStreets()
+{
+    for(auto const & s : street_list) {
+        delete s;
+    }
+}
+
+/*
+ * @brief Function loads streets from map file into street_list of this class.
+ * TODO fix to take argument name of file
+ */
 void AllStreets::loadStreets()
 {
     QJsonDocument jsonDocument;
@@ -53,13 +73,13 @@ void AllStreets::loadStreets()
         QJsonObject obj = jArray[i].toObject();
 
         //if any of important data to form street is missing, closes program
-        if(obj["x1"].toString().size() == 0 || obj["x2"].toString().size() == 0 || obj["y1"].toString().size() == 0 ||
-                obj["y2"].toString().size() == 0 || obj["id"].toString().size() == 0 || obj["time"].toString().size() == 0) {
-            std::cerr << "Missing vital information about " << i << ". street in file.";
+        if(!obj.contains("x1") || !obj.contains("x2") || !obj.contains("y1") || !obj.contains("y2") || !obj.contains("time") ||
+                !obj.contains("id")) {
+            std::cerr << "Missing vital information about " << i+1 << ". street in file.";
             exit(1);
         }
 
-        Street *new_street = new Street(obj["x1"].toInt(), obj["y1"].toInt(), obj["x2"].toInt(), obj["y2"].toInt(), obj["id"].toInt(), obj["name"].toString());
+        Street *new_street = new Street(obj["x1"].toInt(), obj["y1"].toInt(), obj["x2"].toInt(), obj["y2"].toInt(), obj["id"].toInt(), obj["time"].toInt(), obj["name"].toString());
         street_list.push_back(new_street);
      }
 }

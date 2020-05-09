@@ -23,7 +23,8 @@ public:
     int id, time, difficulty;
 
     explicit Street(QObject *parent = nullptr);
-    Street(int x_1, int y_1, int x_2, int y_2, int s_id, QString s_name, QObject *parent = nullptr);
+    Street(int x_1, int y_1, int x_2, int y_2, int s_id, int s_time, QString s_name, QObject *parent = nullptr);
+    int count_time();
 
 signals:
 
@@ -37,8 +38,10 @@ class AllStreets : public QObject
 private:
 
 public:
-    std::list<Street*> street_list;
     explicit AllStreets(QObject *parent = nullptr);
+    ~AllStreets();
+
+    std::list<Street*> street_list;
     void loadStreets();
 
 signals:

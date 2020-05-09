@@ -6,13 +6,18 @@
  */
 
 #include "mapwidget.h"
-#include "street.h"
 
 MapWidget::MapWidget(QWidget *parent) : QWidget(parent)
 {
-    AllStreets* s = new AllStreets();
-    s->loadStreets();
+    streets = new AllStreets();
+    streets->loadStreets();
 }
+
+MapWidget::~MapWidget()
+{
+    delete streets;
+}
+
 
 void MapWidget::paintEvent(QPaintEvent *event)
 {
