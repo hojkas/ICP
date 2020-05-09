@@ -39,7 +39,4 @@ public slots:
  private:
 
 };
-
-
-
 #endif // CONNECTION_H

@@ -47,7 +47,6 @@ void AllStreets::loadStreets()
         std::cerr << "Loaded array is empty";
         exit(1);
     }
-    std::list<Street*> my_list;
 
     //Cycle for going through each json object, creating Street object of it and appending to AllStreets list
     for(int i = 0; i < jArray.size(); i++){
@@ -60,10 +59,8 @@ void AllStreets::loadStreets()
             exit(1);
         }
 
-        //Street *new_street = Street(obj["x1"].toInt(), obj["y1"].toInt(), obj["x2"].toInt(), obj["y2"].toInt(), obj["id"].toInt(), obj["name"].toString());
-
-        //my_list.push_back(new_street);
-        //exit(0);
+        Street *new_street = new Street(obj["x1"].toInt(), obj["y1"].toInt(), obj["x2"].toInt(), obj["y2"].toInt(), obj["id"].toInt(), obj["name"].toString());
+        street_list.push_back(new_street);
      }
 }
 

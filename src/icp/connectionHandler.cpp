@@ -26,15 +26,28 @@ void connectionHandler::loadConnections()
     }
 
     for(int i = 0; i < jArray.size() ; i++){
+        connectionElem con;
         QJsonObject obj = jArray[i].toObject();
-        QString name = obj["name"].toString();
-        std::list<QString> crossing;
-        for(int a = 0; a < obj["crossing"].toArray().size(); a++){
-            crossing.push_back(obj["crossing"].toArray()[a].toString());
+        con.name = obj["name"].toString();
+        QJsonArray streetArray = obj["streets"].toArray();
+        for(int a = 0; a < streetArray.size(); a++){
+            bool stop = streetArray[a].toObject()["stop"].toBool();
+            QString streetID = streetArray[a].toObject()["id"].toString();
+            std::tuple<QString,bool> street(streetID,stop);
+            con.streetList.push_back(street);
         }
-        std::list<QString> stops;
-        for(int a = 0; a < obj["stops"].toArray().size(); a++){
-            stops.push_back(obj["stops"].toArray()[a].toString());
-        }
+
+
+        conList.push_back(con);
     }
  }
+
+void connectionHandler::printConnections()
+{
+    for(connectionElem con : conList){
+        for(std::tuple<QString,bool> street : con.streetList){
+            qDebug() << std::get<1>(street);
+        }
+        qDebug() << "-----------------";
+    }
+}
