@@ -11,6 +11,7 @@
 #include <QWidget>
 #include <QPainter>
 #include <QDebug>
+#include <QImage>
 
 #include "street.h"
 
@@ -24,6 +25,7 @@ public:
 
 protected:
     virtual void paintEvent(QPaintEvent *event) override;
+    virtual void resizeEvent(QResizeEvent *event) override;
 
 signals:
 

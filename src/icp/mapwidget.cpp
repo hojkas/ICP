@@ -11,6 +11,7 @@ MapWidget::MapWidget(QWidget *parent) : QWidget(parent)
 {
     streets = new AllStreets();
     streets->loadStreets();
+
 }
 
 MapWidget::~MapWidget()
@@ -24,6 +25,21 @@ void MapWidget::paintEvent(QPaintEvent *event)
     QPainter p(this);
 
     p.setWindow(QRect(0,0,100,100));
-    p.drawLine(50,50,100,0);
-    //p.drawEllipse(rect());
+
+    for(auto const & s : this->streets->street_list) {
+        p.drawLine(s->x1, s->y1, s->x2, s->y2);
+    }
+}
+
+void MapWidget::resizeEvent(QResizeEvent *event)
+{
+    int nWidth = width();
+    int nHeight = height();
+    if(nWidth < nHeight) {
+        nHeight = nWidth;
+    }
+    else nWidth = nHeight;
+    this->resize(nWidth, nHeight);
+    update();
+    QWidget::resizeEvent(event);
 }
