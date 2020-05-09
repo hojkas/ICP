@@ -6,16 +6,19 @@
  */
 
 #include "mapwidget.h"
+#include "street.h"
 
 MapWidget::MapWidget(QWidget *parent) : QWidget(parent)
 {
-
+    AllStreets s;
+    //s.loadStreets();
 }
 
 void MapWidget::paintEvent(QPaintEvent *event)
 {
     QPainter p(this);
+
     p.setWindow(QRect(0,0,100,100));
-    p.drawLine(50,50,0,0);
+    p.drawLine(50,50,100,0);
     //p.drawEllipse(rect());
 }

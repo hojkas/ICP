@@ -1,7 +1,7 @@
 /**
  * @file street.cpp
  * @author xstrna14
- * @brief Class for creating and handling object Street representing street on map.
+ * @brief TODO
  */
 
 #include "street.h"
@@ -12,10 +12,29 @@ Street::Street(QObject *parent) : QObject(parent)
 
 }
 
-void Street::loadStreets()
+Street::Street(int x_1, int y_1, int x_2, int y_2, int s_id, QString s_name, QObject *parent) : QObject(parent)
+{
+    x1 = x_1;
+    x2 = x_2;
+    y1 = y_1;
+    y2 = y_2;
+    id = s_id;
+    name = s_name;
+    difficulty = 1;
+}
+
+AllStreets::AllStreets(QObject *parent) : QObject(parent)
+{
+
+}
+
+void AllStreets::loadStreets()
 {
     QJsonDocument jsonDocument;
     BackEnd backEnd;
+
+
+    //opening document with json, checking if it's not in undesired format
     if(!(backEnd.loadFile("../../examples/map.json", &jsonDocument))){
         exit(1);
     }
@@ -28,9 +47,23 @@ void Street::loadStreets()
         std::cerr << "Loaded array is empty";
         exit(1);
     }
-    for(int i = 0; i < 3; i++){
+    std::list<Street*> my_list;
+
+    //Cycle for going through each json object, creating Street object of it and appending to AllStreets list
+    for(int i = 0; i < jArray.size(); i++){
         QJsonObject obj = jArray[i].toObject();
-        qDebug() << obj["name"].toString();
+
+        //if any of important data to form street is missing, closes program
+        if(obj["x1"].toString().size() == 0 || obj["x2"].toString().size() == 0 || obj["y1"].toString().size() == 0 ||
+                obj["y2"].toString().size() == 0 || obj["id"].toString().size() == 0 || obj["time"].toString().size() == 0) {
+            std::cerr << "Missing vital information about " << i << ". street in file.";
+            exit(1);
+        }
+
+        //Street *new_street = Street(obj["x1"].toInt(), obj["y1"].toInt(), obj["x2"].toInt(), obj["y2"].toInt(), obj["id"].toInt(), obj["name"].toString());
+
+        //my_list.push_back(new_street);
+        //exit(0);
      }
 }
 
