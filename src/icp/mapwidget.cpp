@@ -26,11 +26,19 @@ void MapWidget::paintEvent(QPaintEvent *event)
 
     p.setWindow(QRect(0,0,100,100));
 
+    p.drawLine(0,0,100,0);
+    p.drawLine(0,0,0,100);
+    p.drawLine(100,0,100,100);
+    p.drawLine(0,100,100,100);
+
     for(auto const & s : this->streets->street_list) {
         p.drawLine(s->x1, s->y1, s->x2, s->y2);
     }
 }
 
+
+/* @brief Override resizeEvent to ensure the map widget is square after resizing main window.
+ */
 void MapWidget::resizeEvent(QResizeEvent *event)
 {
     int nWidth = width();
