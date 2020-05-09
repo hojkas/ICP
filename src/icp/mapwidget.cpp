@@ -6,8 +6,6 @@
  */
 
 #include "mapwidget.h"
-#include <QPainter>
-#include <QDebug>
 
 MapWidget::MapWidget(QWidget *parent) : QWidget(parent)
 {

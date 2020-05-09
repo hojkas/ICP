@@ -10,6 +10,7 @@
 
 #include <QWidget>
 #include <QPainter>
+#include <QDebug>
 
 class MapWidget : public QWidget
 {

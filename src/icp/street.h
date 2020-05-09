@@ -9,12 +9,16 @@
 #define STREET_H
 
 #include <QObject>
+#include <QDebug>
+#include <QJsonArray>
+#include <QJsonObject>
 
 class Street : public QObject
 {
     Q_OBJECT
 private:
     int x1, y1, x2, y2;
+
 
 public:
     explicit Street(QObject *parent = nullptr);
@@ -23,6 +27,7 @@ public:
 signals:
 
 public slots:
+    void loadStreets();
 };
 
 #endif // STREET_H
