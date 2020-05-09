@@ -9,6 +9,7 @@
 #define MAPWIDGET_H
 
 #include <QWidget>
+#include <QPainter>
 
 class MapWidget : public QWidget
 {

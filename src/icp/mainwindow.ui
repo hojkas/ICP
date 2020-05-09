@@ -40,7 +40,7 @@
      </layout>
     </item>
     <item>
-     <widget class="MapWidget" name="MapWidget" native="true">
+     <widget class="MapWidget" name="Map" native="true">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
         <horstretch>0</horstretch>
