@@ -5,6 +5,7 @@
 #include <QDebug>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QString>
 
 
 class connection : public QObject
@@ -20,6 +21,12 @@ public slots:
 
  private:
 
+};
+
+class stringList{
+public:
+    QString stringVal;
+    stringList *nextElem;
 };
 
 #endif // CONNECTION_H
