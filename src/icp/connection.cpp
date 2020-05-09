@@ -25,6 +25,6 @@ void connection::loadConnections()
     }
     for(int i = 0; i < 3; i++){
         QJsonObject obj = jArray[i].toObject();
-        qDebug() << obj["name"].toString();
-     }
+
+    }
 }
