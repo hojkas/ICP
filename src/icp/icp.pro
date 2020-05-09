@@ -27,12 +27,16 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     mapwidget.cpp \
-    street.cpp
+    street.cpp \
+    connection.cpp \
+    backend.cpp
 
 HEADERS += \
         mainwindow.h \
     mapwidget.h \
-    street.h
+    street.h \
+    connection.h \
+    backend.h
 
 FORMS += \
         mainwindow.ui
