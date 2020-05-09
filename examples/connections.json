@@ -1,0 +1,28 @@
+[
+{
+	"name":"S1",
+	"crossing": [
+		"Kotlarska",
+		"Ujezd",
+		"Prazska",
+		"Ceska"
+	],
+	"stops": [
+		"Kotlarska",
+		"Ceska"
+	]
+},
+{
+	"name":"S2",
+	"crossing": [
+		"Prazska",
+		"Ujezd",
+		"Kotlarska"
+	],
+	"stops":[
+		"Prazska",
+		"Ujezd",
+		"Kotlarska"
+	]
+}
+]
