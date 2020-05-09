@@ -12,12 +12,15 @@
 #include <QPainter>
 #include <QDebug>
 #include <QImage>
+#include <QCheckBox>
 
 #include "street.h"
 
 class MapWidget : public QWidget
 {
     Q_OBJECT
+private:
+    bool streetNamesToggled;
 public:
     explicit MapWidget(QWidget *parent = nullptr);
     ~MapWidget();
@@ -30,6 +33,7 @@ protected:
 signals:
 
 public slots:
+    void onToggleStreetNames(int);
 };
 
 #endif // MAPWIDGET_H
