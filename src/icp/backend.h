@@ -3,18 +3,15 @@
 
 #include <QObject>
 #include <QString>
-#include <QJsonObject>
-#include <QJsonArray>
 #include <QJsonDocument>
 #include <QFile>
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
 #include <unistd.h>
-#include <errno.h>
-#include <time.h>
 #include <string>
 #include <fstream>
+#include <err.h>
 
 class BackEnd : public QObject
 {
@@ -26,11 +23,10 @@ public:
 signals:
 
 public slots:
-    bool loadFile(QString file_path, QJsonObject* jsonObject);
+    bool loadFile(QString file_path, QJsonDocument* jsonDocument);
 
 private:
     QJsonDocument json_doc;
-    QJsonObject json_obj;
 };
 
 #endif // BACKEND_H
