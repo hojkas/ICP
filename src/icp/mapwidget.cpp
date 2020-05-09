@@ -10,8 +10,8 @@
 
 MapWidget::MapWidget(QWidget *parent) : QWidget(parent)
 {
-    AllStreets s;
-    //s.loadStreets();
+    AllStreets* s = new AllStreets();
+    s->loadStreets();
 }
 
 void MapWidget::paintEvent(QPaintEvent *event)

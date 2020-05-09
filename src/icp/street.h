@@ -37,7 +37,7 @@ class AllStreets : public QObject
 private:
 
 public:
-    std::list<Street> street_list;
+    std::list<Street*> street_list;
     explicit AllStreets(QObject *parent = nullptr);
     void loadStreets();
 

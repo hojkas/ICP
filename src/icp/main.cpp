@@ -6,14 +6,12 @@
  */
 
 #include "mainwindow.h"
-#include "connectionHandler.h"
 #include <QApplication>
 
 int main(int argc, char *argv[])
 {
-    connectionHandler conHandler;
-    conHandler.loadConnections();
     QApplication a(argc, argv);
+
     MainWindow w;
     w.show();
 

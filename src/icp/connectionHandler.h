@@ -23,6 +23,6 @@ public slots:
 
 };
 
-class c
+//class c
 
 #endif // CONNECTION_H
