@@ -33,7 +33,6 @@ MapWidget::~MapWidget()
 
 void MapWidget::onToggleStreetNames(bool val)
 {
-    qDebug() << "street name toggle";
     if(val) this->streetNamesToggled = true;
     else this->streetNamesToggled = false;
     update();
