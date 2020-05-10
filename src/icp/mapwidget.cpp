@@ -40,7 +40,19 @@ void MapWidget::paintEvent(QPaintEvent *event)
     //getting default font
     QFont p_font = p.font();
 
+
     p.setWindow(QRect(0,0,100,100));
+
+    /* TODO figure out
+    float scl = 1;
+    p.scale(scl,scl);
+    int trans = 0;
+    p.translate(trans, trans);
+    //p.translate(50,50);
+    int off = 40;
+    int start = 0 + off;
+    int end = 100 - off;
+    p.setWindow(50, 50, 100, 100);*/
 
     //TODO remove, just ui stuff
     p.drawLine(0,0,100,0);
