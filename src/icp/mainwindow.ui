@@ -10,6 +10,12 @@
     <height>710</height>
    </rect>
   </property>
+  <property name="mouseTracking">
+   <bool>true</bool>
+  </property>
+  <property name="focusPolicy">
+   <enum>Qt::ClickFocus</enum>
+  </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
@@ -217,6 +223,12 @@
         <width>0</width>
         <height>0</height>
        </size>
+      </property>
+      <property name="mouseTracking">
+       <bool>true</bool>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::ClickFocus</enum>
       </property>
      </widget>
     </item>

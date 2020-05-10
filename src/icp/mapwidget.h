@@ -14,6 +14,7 @@
 #include <QImage>
 #include <QCheckBox>
 #include <QTimer>
+#include <QMouseEvent>
 
 #include "street.h"
 #include "connectionHandler.h"
@@ -38,6 +39,7 @@ public:
 protected:
     virtual void paintEvent(QPaintEvent *event) override;
     virtual void resizeEvent(QResizeEvent *event) override;
+    virtual void mousePressEvent(QMouseEvent *event) override;
 
 signals:
 

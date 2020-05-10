@@ -235,3 +235,10 @@ void MapWidget::resizeEvent(QResizeEvent *event)
     update();
     QWidget::resizeEvent(event);
 }
+
+/* @brief Override for capturing all mouse clicking inside widget.
+ */
+void MapWidget::mousePressEvent(QMouseEvent *event)
+{
+    qDebug() << "clicked at" << event->globalX() << ":" << event->globalY();
+}
