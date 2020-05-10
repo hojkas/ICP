@@ -16,7 +16,6 @@ busElem::busElem(bool map, connectionElem *connection, int dep, int tOS, int X, 
 connectionHandler::connectionHandler(QObject *parent) : QObject(parent)
 {
     timePassed = 0;
-    timeSinceUpdate = 0;
 }
 
 void connectionHandler::loadConnections(std::list<Street*> streetList)
@@ -83,7 +82,7 @@ void connectionHandler::printConnections()
     }
     qDebug() << "------BUSES---------";
     for(busElem* bus : busList){
-        qDebug() << "X: " <<bus->x << "Y: " << bus->y;
+        if(bus->onMap) qDebug() << "X: " <<bus->x << "Y: " << bus->y;
     }
 }
 
@@ -100,19 +99,23 @@ std::tuple<Street*, bool, bool> connectionHandler::findStreet(Street* currStreet
     }
 }
 
-void connectionHandler::internalTimer()
-{
-    for(busElem *bus : busList){
-        if(bus->departure == timePassed) bus->onMap = true;
-    }
-    timePassed++;
-    timeSinceUpdate++;
-}
-
 void connectionHandler::busUpdate(){
+    currentTime = currentTime.addSecs(15);
+    QTime temp;
+    temp.setHMS(0,0,0,0);
+    timePassed = temp.secsTo(currentTime);
+    int secondsPerTick = 15;
     for(busElem *bus: busList){
+        bool justEntered = false;
+        if(!bus->onMap){
+            if(bus->departure < timePassed){
+                bus->onMap = true;
+                bus->timeOnStreet = bus->departure - timePassed;
+                justEntered = true;
+            }
+        }
         if(bus->onMap){
-            bus->timeOnStreet += timeSinceUpdate;
+            if(!justEntered) bus->timeOnStreet += secondsPerTick;
             if(bus->timeOnStreet >= bus->curStreet->time){
                 bus->timeOnStreet -= bus->curStreet->time;
                 bus->curStreet = std::get<0>(this->findStreet(bus->curStreet, bus->con->streetList, true));
@@ -132,4 +135,5 @@ void connectionHandler::busUpdate(){
             }
         }
     }
+    emit busUpdated();
 }
