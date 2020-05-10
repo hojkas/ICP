@@ -210,6 +210,15 @@ void MapWidget::paintEvent(QPaintEvent *event)
             }
         }
      }
+
+    //This part handles painting current position of all buses
+    p.setPen(Qt::NoPen);
+    p.setBrush(Qt::black);
+
+    //Drawing of curr position of buses
+    for(busElem* bus : this->conHandler->busList){
+        if(bus->onMap) p.drawEllipse(QPoint(bus->x, bus->y), 2, 2);
+    }
 }
 
 
