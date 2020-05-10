@@ -24,11 +24,17 @@ MapWidget::MapWidget(QWidget *parent) : QWidget(parent)
     internalClock = new QTimer(this);
     connect(internalClock, &QTimer::timeout, conHandler, &connectionHandler::printConnections);
     internalClock->start(1000);
+    updateClock = new QTimer(this);
+    connect(updateClock, &QTimer::timeout, conHandler, &connectionHandler::printConnections);
+    updateClock->start(20000);
 }
 
 MapWidget::~MapWidget()
 {
     delete streets;
+    delete conHandler;
+    delete internalClock;
+    delete updateClock;
 }
 
 
