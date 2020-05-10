@@ -14,11 +14,9 @@
 #include <QImage>
 #include <QCheckBox>
 #include <QTimer>
-<<<<<<< HEAD
 #include <QMouseEvent>
-=======
 #include <QtGlobal>
->>>>>>> master
+
 
 #include "street.h"
 #include "connectionHandler.h"
@@ -39,6 +37,11 @@ private:
     QTimer *internalClock;
 
     void createTimerMessage();
+
+    //paint functions
+    void paintBuses(QPainter*);
+    void paintStreets(QPainter*);
+    void paintStreetInfo(QPainter*);
 
 public:
     explicit MapWidget(QWidget *parent = nullptr);

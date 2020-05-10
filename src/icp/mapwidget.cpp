@@ -22,21 +22,16 @@ MapWidget::MapWidget(QWidget *parent) : QWidget(parent)
     streetColorTraffic = false;
     modeModifyClosed = false;
     modeModifyTraffic = false;
-    timeModifier = 0;
+    timeModifier = 1;
 
     conHandler = new connectionHandler;
     conHandler->loadConnections(streets->street_list);
     conHandler->currentTime.setHMS(0,0,0);
     internalClock = new QTimer(this);
     connect(internalClock, &QTimer::timeout, conHandler, &connectionHandler::busUpdate);
-<<<<<<< HEAD
-    internalClock->start(2000);
-    //connect(conHandler, &connectionHandler::busUpdated, conHandler, &connectionHandler::printConnections);
-=======
-    internalClock->start(500);
+    internalClock->start(30000);
     connect(conHandler, &connectionHandler::busUpdated, conHandler, &connectionHandler::printBuses);
     connect(conHandler,&connectionHandler::busUpdated, this, QOverload<>::of(&MapWidget::update));
->>>>>>> master
 }
 
 MapWidget::~MapWidget()
@@ -240,47 +235,63 @@ void MapWidget::paintEvent(QPaintEvent *event)
         }
     }
 
+    paintStreetInfo(&p);
+    paintBuses(&p);
+}
+
+/* @brief Help function for paintEvent to draw all streets in color according to flag info
+ */
+void MapWidget::paintStreets(QPainter* p)
+{
+
+}
+
+/* @brief Help function for paintEvent to draw all street info if right bool flag is set
+ */
+void MapWidget::paintStreetInfo(QPainter* p)
+{
     // THis part handles radio buttons about displaying street properties
     if(this->streetNamesToggled || this->streetTimeToggled || this->streetIdToggled) {
         //setting drawing properties for writing street properties (where there are)
-        QPen s_name_pen = p_pen;
-        QFont s_name_font = p_font;
+        QFont s_name_font = QFont();
         s_name_font.setPointSize(2);
-
-        p.setFont(s_name_font);
-        p.setPen(s_name_pen);
-
+        p->setFont(s_name_font);
+        p->setPen(QPen());
         //if it should display name
         if(this->streetNamesToggled) {
             //Painting street names
             for(auto const & s : this->streets->street_list) {
-                p.drawText(((s->x1+s->x2)/2)-3, ((s->y1+s->y2)/2)+1, s->name);
+                p->drawText(((s->x1+s->x2)/2)-3, ((s->y1+s->y2)/2)+1, s->name);
             }
         }
         //if it should display id
         else if(this->streetIdToggled) {
             for(auto const & s : this->streets->street_list) {
-                p.drawText(((s->x1+s->x2)/2)-1, ((s->y1+s->y2)/2)+1, QString::number(s->id));
+                p->drawText(((s->x1+s->x2)/2)-1, ((s->y1+s->y2)/2)+1, QString::number(s->id));
             }
         }
         //if it should display time to go through street
         else if(this->streetTimeToggled) {
             for(auto const & s : this->streets->street_list) {
-                p.drawText(((s->x1+s->x2)/2)-1, ((s->y1+s->y2)/2)+1, QString::number(s->time));
+                p->drawText(((s->x1+s->x2)/2)-1, ((s->y1+s->y2)/2)+1, QString::number(s->time));
             }
         }
-     }
-
-    //This part handles painting current position of all buses
-    p.setPen(Qt::NoPen);
-    p.setBrush(Qt::black);
-
-    //Drawing of curr position of buses
-    for(busElem* bus : this->conHandler->busList){
-        if(bus->onMap) p.drawEllipse(QPoint(bus->x, bus->y), 2, 2);
     }
 }
 
+/* @brief Help function for paintEvent to draw all bus positions
+ */
+void MapWidget::paintBuses(QPainter* p)
+{
+    //This part handles painting current position of all buses
+    p->setPen(Qt::NoPen);
+    p->setBrush(Qt::black);
+
+    //Drawing of curr position of buses
+    for(busElem* bus : this->conHandler->busList){
+        if(bus->onMap) p->drawEllipse(QPoint(bus->x, bus->y), 2, 2);
+    }
+}
 
 /* @brief Override resizeEvent to ensure the map widget is square after resizing main window.
  */
