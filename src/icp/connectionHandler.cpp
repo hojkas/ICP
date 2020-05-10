@@ -80,6 +80,10 @@ void connectionHandler::printConnections()
         }
         qDebug() << "-----------------";
     }
+}
+
+void connectionHandler::printBuses()
+{
     qDebug() << "------BUSES---------";
     for(busElem* bus : busList){
         if(bus->onMap) qDebug() <<"Connection" << bus->con->name << "Street:" << bus->curStreet->id << "Time spent on street:" << bus->timeOnStreet <<"X:" <<bus->x << "Y:" << bus->y;
@@ -99,24 +103,38 @@ std::tuple<Street*, bool, bool> connectionHandler::findStreet(Street* currStreet
     }
 }
 
+void connectionHandler::resetBus(busElem* bus)
+{
+    bus->onMap = false;
+    bus->curStreet = std::get<0>(bus->con->streetList.front());
+    int x = bus->curStreet->x1;
+    int y = bus->curStreet->y1;
+    bus->timeOnStreet = 0;
+}
+
 void connectionHandler::busUpdate(){
-    currentTime = currentTime.addSecs(15);
+    int secondsPerTick = 30;
+    currentTime = currentTime.addSecs(secondsPerTick);
     QTime temp;
     temp.setHMS(0,0,0,0);
     timePassed = temp.secsTo(currentTime);
-    int secondsPerTick = 15;
     for(busElem *bus: busList){
         bool justEntered = false;
         if(!bus->onMap){
             if(bus->departure < timePassed && (timePassed - bus->departure) <= secondsPerTick){
                 bus->onMap = true;
-                bus->timeOnStreet = timePassed - bus->departure;
+                bus->timeOnStreet = bus->curStreet->count_time() / 2;
                 justEntered = true;
             }
         }
         if(bus->onMap){
             if(!justEntered) bus->timeOnStreet += secondsPerTick;
-            if(bus->timeOnStreet >= bus->curStreet->count_time()){
+            if(bus->curStreet == std::get<0>(bus->con->streetList.back()) && \
+               (bus->timeOnStreet >= bus->curStreet->count_time() / 2)){
+                this->resetBus(bus);
+                continue;
+            }
+            else if(bus->timeOnStreet >= bus->curStreet->count_time()){
                 bus->timeOnStreet -= bus->curStreet->count_time();
                 bus->curStreet = std::get<0>(this->findStreet(bus->curStreet, bus->con->streetList, true));
             }

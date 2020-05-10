@@ -26,8 +26,8 @@ MapWidget::MapWidget(QWidget *parent) : QWidget(parent)
     conHandler->currentTime.setHMS(0,0,0);
     internalClock = new QTimer(this);
     connect(internalClock, &QTimer::timeout, conHandler, &connectionHandler::busUpdate);
-    internalClock->start(2000);
-    connect(conHandler, &connectionHandler::busUpdated, conHandler, &connectionHandler::printConnections);
+    internalClock->start(500);
+    connect(conHandler, &connectionHandler::busUpdated, conHandler, &connectionHandler::printBuses);
     connect(conHandler,&connectionHandler::busUpdated, this, QOverload<>::of(&MapWidget::update));
 }
 
