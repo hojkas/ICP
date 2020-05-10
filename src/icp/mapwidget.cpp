@@ -23,12 +23,11 @@ MapWidget::MapWidget(QWidget *parent) : QWidget(parent)
 
     conHandler = new connectionHandler;
     conHandler->loadConnections(streets->street_list);
+    conHandler->currentTime.setHMS(0,0,0);
     internalClock = new QTimer(this);
-    connect(internalClock, &QTimer::timeout, conHandler, &connectionHandler::printConnections);
-    internalClock->start(1000);
-    updateClock = new QTimer(this);
-    connect(updateClock, &QTimer::timeout, conHandler, &connectionHandler::printConnections);
-    updateClock->start(20000);
+    connect(internalClock, &QTimer::timeout, conHandler, &connectionHandler::busUpdate);
+    internalClock->start(2000);
+    connect(conHandler, &connectionHandler::busUpdated, conHandler, &connectionHandler::printConnections);
 
 }
 
