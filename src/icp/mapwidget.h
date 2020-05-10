@@ -14,7 +14,11 @@
 #include <QImage>
 #include <QCheckBox>
 #include <QTimer>
+<<<<<<< HEAD
 #include <QMouseEvent>
+=======
+#include <QtGlobal>
+>>>>>>> master
 
 #include "street.h"
 #include "connectionHandler.h"

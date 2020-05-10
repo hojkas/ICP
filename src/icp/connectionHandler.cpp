@@ -80,9 +80,13 @@ void connectionHandler::printConnections()
         }
         qDebug() << "-----------------";
     }
+}
+
+void connectionHandler::printBuses()
+{
     qDebug() << "------BUSES---------";
     for(busElem* bus : busList){
-        if(bus->onMap) qDebug() << "X: " <<bus->x << "Y: " << bus->y;
+        if(bus->onMap) qDebug() <<"Connection" << bus->con->name << "Street:" << bus->curStreet->id << "Time spent on street:" << bus->timeOnStreet <<"X:" <<bus->x << "Y:" << bus->y;
     }
 }
 
@@ -99,38 +103,53 @@ std::tuple<Street*, bool, bool> connectionHandler::findStreet(Street* currStreet
     }
 }
 
+void connectionHandler::resetBus(busElem* bus)
+{
+    bus->onMap = false;
+    bus->curStreet = std::get<0>(bus->con->streetList.front());
+    int x = bus->curStreet->x1;
+    int y = bus->curStreet->y1;
+    bus->timeOnStreet = 0;
+}
+
 void connectionHandler::busUpdate(){
-    currentTime = currentTime.addSecs(15);
+    int secondsPerTick = 30;
+    currentTime = currentTime.addSecs(secondsPerTick);
     QTime temp;
     temp.setHMS(0,0,0,0);
     timePassed = temp.secsTo(currentTime);
-    int secondsPerTick = 15;
     for(busElem *bus: busList){
         bool justEntered = false;
         if(!bus->onMap){
-            if(bus->departure < timePassed){
+            if(bus->departure < timePassed && (timePassed - bus->departure) <= secondsPerTick){
                 bus->onMap = true;
-                bus->timeOnStreet = bus->departure - timePassed;
+                bus->timeOnStreet = bus->curStreet->count_time() / 2;
                 justEntered = true;
             }
         }
         if(bus->onMap){
             if(!justEntered) bus->timeOnStreet += secondsPerTick;
-            if(bus->timeOnStreet >= bus->curStreet->time){
-                bus->timeOnStreet -= bus->curStreet->time;
+            if(bus->curStreet == std::get<0>(bus->con->streetList.back()) && \
+               (bus->timeOnStreet >= bus->curStreet->count_time() / 2)){
+                this->resetBus(bus);
+                continue;
+            }
+            else if(bus->timeOnStreet >= bus->curStreet->count_time()){
+                bus->timeOnStreet -= bus->curStreet->count_time();
                 bus->curStreet = std::get<0>(this->findStreet(bus->curStreet, bus->con->streetList, true));
             }
             std::tuple<Street*, bool, bool> streetTuple = this->findStreet(bus->curStreet,bus->con->streetList,false);
+            float streetTime = bus->curStreet->count_time();
             if(std::get<1>(streetTuple)){
-                bus->x = bus->curStreet->x1 + (bus->timeOnStreet/bus->curStreet->time) * \
-                        (bus->curStreet->x2 - bus->curStreet->x1);
-                bus->y = bus->curStreet->y1 + (bus->timeOnStreet/bus->curStreet->time) * \
+                bus->x = (bus->curStreet->x1 + (bus->timeOnStreet/streetTime) * \
+                        (bus->curStreet->x2 - bus->curStreet->x1));
+                bus->y = bus->curStreet->y1 + (bus->timeOnStreet/streetTime) * \
                         (bus->curStreet->y2 - bus->curStreet->y1);
             }
             else{
-                bus->x = bus->curStreet->x2 + (bus->timeOnStreet/bus->curStreet->time) * \
+                bus->x = bus->curStreet->x2 + (bus->timeOnStreet/streetTime) * \
                         (bus->curStreet->x1 - bus->curStreet->x2);
-                bus->y = bus->curStreet->y2 + (bus->timeOnStreet/bus->curStreet->time) * \
+                bus->y = bus->curStreet->y2 + (bus->timeOnStreet/streetTime) * \
                         (bus->curStreet->y1 - bus->curStreet->y2);
             }
         }

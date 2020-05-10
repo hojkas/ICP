@@ -40,11 +40,13 @@ public:
     std::list<connectionElem> conList;
     std::list<busElem*> busList;
     void loadConnections(std::list<Street *> street_list);
+    void resetBus(busElem* bus);
     std::tuple<Street*, bool, bool> findStreet(Street* currStreet, std::list<std::tuple<Street*, bool, bool>> streetList, bool next);
 signals:
     void busUpdated();
 public slots:
     void printConnections();
+    void printBuses();
     void busUpdate();
  private:
     int timePassed;

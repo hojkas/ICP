@@ -5,7 +5,7 @@
 	[
 		{
 			"id": 2,
-            "right_direction": false,
+            "right_direction": true,
 			"stop": true
 		},
 		{
@@ -31,77 +31,41 @@
 			"return":false
 		},
 		{
-			"time":10,
-			"return":false
-		},
-		{
-			"time":20,
-			"return":false
-		},
-		{
-			"time":30,
-			"return":false
-		},
-		{
-			"time":40,
-			"return":false
-		},
-		{
-			"time":50,
+            "time":300,
 			"return":false
 		}
 	]
 },
 {
-	"name":"S2",
-	"streets":
-	[
-		{
-			"id": 5,
+    "name":"S2",
+    "streets":
+    [
+        {
+            "id": 5,
             "right_direction": true,
-			"stop": true
-		},
-		{
-			"id": 3,
+            "stop": true
+        },
+        {
+            "id": 3,
             "right_direction":false,
-			"stop": true
-		},
-		{
-			"id": 2,
-            "right_direction":true,
-			"stop": true
-		}
-	],
-	"buses":
-	[
-		{
-			"time":5,
-			"return":false
-		},
-		{
-			"time":15,
-			"return":false
-		},
-		{
-			"time":25,
-			"return":false
-		},
-		{
-			"time":35,
-			"return":false
-		},
-		{
-			"time":45,
-			"return":false
-		},
-		{
-			"time":55,
-			"return":false
-		},
-		{
-			"time":65,
-			"return":false
-		}
-	]
+            "stop": true
+        },
+        {
+            "id": 2,
+            "right_direction":false,
+            "stop": true
+        }
+    ],
+    "buses":
+    [
+        {
+            "time":15,
+            "return":false
+        },
+        {
+            "time":345,
+            "return":false
+        }
+    ]
 }
 ]
