@@ -13,8 +13,10 @@
 #include <QDebug>
 #include <QImage>
 #include <QCheckBox>
+#include <QTimer>
 
 #include "street.h"
+#include "connectionHandler.h"
 
 class MapWidget : public QWidget
 {
@@ -23,10 +25,12 @@ private:
     bool streetNamesToggled;
     bool streetIdToggled;
     bool streetTimeToggled;
+    QTimer *internalClock;
 public:
     explicit MapWidget(QWidget *parent = nullptr);
     ~MapWidget();
     AllStreets* streets;
+    connectionHandler* conHandler;
 
 protected:
     virtual void paintEvent(QPaintEvent *event) override;

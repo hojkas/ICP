@@ -19,10 +19,11 @@ MapWidget::MapWidget(QWidget *parent) : QWidget(parent)
     streetTimeToggled = false;
     streetIdToggled = false;
 
-    connectionHandler conHandle;
-    conHandle.loadConnections(streets->street_list);
-    conHandle.printConnections();
-
+    conHandler = new connectionHandler;
+    conHandler->loadConnections(streets->street_list);
+    internalClock = new QTimer(this);
+    connect(internalClock, &QTimer::timeout, conHandler, &connectionHandler::printConnections);
+    internalClock->start(1000);
 }
 
 MapWidget::~MapWidget()
