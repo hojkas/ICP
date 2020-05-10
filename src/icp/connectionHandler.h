@@ -13,7 +13,7 @@ class connectionElem
 {
 public:
     QString name;
-    std::list<std::tuple<Street*, bool>> streetList;
+    std::list<std::tuple<Street*, bool, bool>> streetList;
 };
 
 class busElem
