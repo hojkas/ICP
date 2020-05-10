@@ -7,6 +7,7 @@
 
 #include "mapwidget.h"
 #include "mainwindow.h"
+#include "connectionHandler.h"
 
 MapWidget::MapWidget(QWidget *parent) : QWidget(parent)
 {
@@ -14,7 +15,13 @@ MapWidget::MapWidget(QWidget *parent) : QWidget(parent)
     streets->loadStreets();
 
     //TODO actual solution
-    streetNamesToggled = true;
+    streetNamesToggled = false;
+    streetTimeToggled = false;
+    streetIdToggled = false;
+
+    connectionHandler conHandle;
+    conHandle.loadConnections(streets->street_list);
+    conHandle.printConnections();
 
 }
 
@@ -24,13 +31,27 @@ MapWidget::~MapWidget()
 }
 
 
-void MapWidget::onToggleStreetNames(int val)
+void MapWidget::onToggleStreetNames(bool val)
 {
+    qDebug() << "street name toggle";
     if(val) this->streetNamesToggled = true;
     else this->streetNamesToggled = false;
     update();
 }
 
+void MapWidget::onToggleStreetId(bool val)
+{
+    if(val) this->streetIdToggled = true;
+    else this->streetIdToggled = false;
+    update();
+}
+
+void MapWidget::onToggleStreetTime(bool val)
+{
+    if(val) this->streetTimeToggled = true;
+    else this->streetTimeToggled = false;
+    update();
+}
 
 void MapWidget::paintEvent(QPaintEvent *event)
 {
@@ -54,7 +75,7 @@ void MapWidget::paintEvent(QPaintEvent *event)
     int end = 100 - off;
     p.setWindow(50, 50, 100, 100);*/
 
-    //TODO remove, just ui stuff
+    //Map outline
     p.drawLine(0,0,100,0);
     p.drawLine(0,0,0,100);
     p.drawLine(100,0,100,100);
@@ -72,8 +93,9 @@ void MapWidget::paintEvent(QPaintEvent *event)
         p.drawLine(s->x1, s->y1, s->x2, s->y2);
     }
 
-    if(this->streetNamesToggled) {
-        //setting drawing properties for writing street names (where there are)
+    // THis part handles radio buttons about displaying street properties
+    if(this->streetNamesToggled || this->streetTimeToggled || this->streetIdToggled) {
+        //setting drawing properties for writing street properties (where there are)
         QPen s_name_pen = p_pen;
         QFont s_name_font = p_font;
         s_name_font.setPointSize(2);
@@ -81,9 +103,24 @@ void MapWidget::paintEvent(QPaintEvent *event)
         p.setFont(s_name_font);
         p.setPen(s_name_pen);
 
-        //Painting street names
-        for(auto const & s : this->streets->street_list) {
-            p.drawText(((s->x1+s->x2)/2)-5, ((s->y1+s->y2)/2)+1, s->name);
+        //if it should display name
+        if(this->streetNamesToggled) {
+            //Painting street names
+            for(auto const & s : this->streets->street_list) {
+                p.drawText(((s->x1+s->x2)/2)-3, ((s->y1+s->y2)/2)+1, s->name);
+            }
+        }
+        //if it should display id
+        else if(this->streetIdToggled) {
+            for(auto const & s : this->streets->street_list) {
+                p.drawText(((s->x1+s->x2)/2)-1, ((s->y1+s->y2)/2)+1, QString::number(s->id));
+            }
+        }
+        //if it should display time to go through street
+        else if(this->streetTimeToggled) {
+            for(auto const & s : this->streets->street_list) {
+                p.drawText(((s->x1+s->x2)/2)-1, ((s->y1+s->y2)/2)+1, QString::number(s->time));
+            }
         }
      }
 }

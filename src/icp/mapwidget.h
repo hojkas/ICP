@@ -21,6 +21,8 @@ class MapWidget : public QWidget
     Q_OBJECT
 private:
     bool streetNamesToggled;
+    bool streetIdToggled;
+    bool streetTimeToggled;
 public:
     explicit MapWidget(QWidget *parent = nullptr);
     ~MapWidget();
@@ -33,7 +35,9 @@ protected:
 signals:
 
 public slots:
-    void onToggleStreetNames(int);
+    void onToggleStreetId(bool);
+    void onToggleStreetNames(bool);
+    void onToggleStreetTime(bool);
 };
 
 #endif // MAPWIDGET_H
