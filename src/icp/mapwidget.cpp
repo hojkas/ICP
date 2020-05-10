@@ -159,9 +159,19 @@ void MapWidget::paintEvent(QPaintEvent *event)
     p.drawLine(100,0,100,100);
     p.drawLine(0,100,100,100);
 
+
+    paintStreets(&p);
+    paintStreetInfo(&p);
+    paintBuses(&p);
+}
+
+/* @brief Help function for paintEvent to draw all streets in color according to flag info
+ */
+void MapWidget::paintStreets(QPainter* p)
+{
     //This part handles color of streets
     //Formating for street painting
-    QPen street_pen = p_pen;
+    QPen street_pen = QPen();
     street_pen.setCapStyle(Qt::RoundCap);
     street_pen.setWidth(3);
     street_pen.setBrush(Qt::gray);
@@ -182,21 +192,21 @@ void MapWidget::paintEvent(QPaintEvent *event)
         //loop to draw streets
         for(auto const & s : this->streets->street_list) {
             if(s->count_time() < 150) {
-                p.setPen(tier1);
+                p->setPen(tier1);
             }
             else if(s->count_time() < 250) {
-                p.setPen(tier2);
+                p->setPen(tier2);
             }
             else if(s->count_time() < 350) {
-                p.setPen(tier3);
+                p->setPen(tier3);
             }
             else if(s->count_time() < 450) {
-                p.setPen(tier4);
+                p->setPen(tier4);
             }
             else {
-                p.setPen(tier5);
+                p->setPen(tier5);
             }
-            p.drawLine(s->x1, s->y1, s->x2, s->y2);
+            p->drawLine(s->x1, s->y1, s->x2, s->y2);
         }
     }
     else if(streetColorTraffic) {
@@ -213,37 +223,27 @@ void MapWidget::paintEvent(QPaintEvent *event)
         //loop to draw streets
         for(auto const & s : this->streets->street_list) {
             if(s->traffic == 1) {
-                p.setPen(tier1);
+                p->setPen(tier1);
             }
             else if(s->traffic == 2) {
-                p.setPen(tier2);
+                p->setPen(tier2);
             }
             else if(s->traffic == 3) {
-                p.setPen(tier3);
+                p->setPen(tier3);
             }
             else{
-                p.setPen(tier4);
+                p->setPen(tier4);
             }
-            p.drawLine(s->x1, s->y1, s->x2, s->y2);
+            p->drawLine(s->x1, s->y1, s->x2, s->y2);
         }
     }
     else {
-        p.setPen(street_pen);
+        p->setPen(street_pen);
         //Street painting grey (just grey lines, default)
         for(auto const & s : this->streets->street_list) {
-            p.drawLine(s->x1, s->y1, s->x2, s->y2);
+            p->drawLine(s->x1, s->y1, s->x2, s->y2);
         }
     }
-
-    paintStreetInfo(&p);
-    paintBuses(&p);
-}
-
-/* @brief Help function for paintEvent to draw all streets in color according to flag info
- */
-void MapWidget::paintStreets(QPainter* p)
-{
-
 }
 
 /* @brief Help function for paintEvent to draw all street info if right bool flag is set
