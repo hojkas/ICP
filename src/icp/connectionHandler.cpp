@@ -59,7 +59,7 @@ void connectionHandler::loadConnections(std::list<Street*> streetList)
 void connectionHandler::printConnections()
 {
     for(connectionElem con : conList){
-        for(std::tuple<Street*,bool> street : con.streetList){
+        for(std::tuple<Street*,bool,bool> street : con.streetList){
             qDebug() << std::get<0>(street)->id;
         }
         qDebug() << "-----------------";
