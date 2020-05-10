@@ -28,8 +28,14 @@ private:
     bool streetTimeToggled;
     bool streetColorTime;
     bool streetColorTraffic;
+    bool modeModifyTraffic;
+    bool modeModifyClosed;
+    int timeModifier;
 
     QTimer *internalClock;
+
+    void createTimerMessage();
+
 public:
     explicit MapWidget(QWidget *parent = nullptr);
     ~MapWidget();
@@ -42,6 +48,8 @@ protected:
     virtual void mousePressEvent(QMouseEvent *event) override;
 
 signals:
+    void TimerMessage(QString);
+    void ErrorMessage(QString);
 
 public slots:
     void onToggleStreetId(bool);
@@ -50,6 +58,11 @@ public slots:
 
     void onToggleColorTime(bool);
     void onToggleColorTraffic(bool);
+
+    void onToggleModifyTraffic(bool);
+    void onToggleModifyClosed(bool);
+
+    void onTimeSliderChange(int);
 };
 
 #endif // MAPWIDGET_H

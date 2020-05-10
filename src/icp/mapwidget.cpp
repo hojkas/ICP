@@ -14,12 +14,15 @@ MapWidget::MapWidget(QWidget *parent) : QWidget(parent)
     streets = new AllStreets();
     streets->loadStreets();
 
-    //TODO actual solution
+    //default values
     streetNamesToggled = false;
     streetTimeToggled = false;
     streetIdToggled = false;
     streetColorTime = false;
     streetColorTraffic = false;
+    modeModifyClosed = false;
+    modeModifyTraffic = false;
+    timeModifier = 0;
 
     conHandler = new connectionHandler;
     conHandler->loadConnections(streets->street_list);
@@ -27,8 +30,7 @@ MapWidget::MapWidget(QWidget *parent) : QWidget(parent)
     internalClock = new QTimer(this);
     connect(internalClock, &QTimer::timeout, conHandler, &connectionHandler::busUpdate);
     internalClock->start(2000);
-    connect(conHandler, &connectionHandler::busUpdated, conHandler, &connectionHandler::printConnections);
-
+    //connect(conHandler, &connectionHandler::busUpdated, conHandler, &connectionHandler::printConnections);
 }
 
 MapWidget::~MapWidget()
@@ -75,6 +77,57 @@ void MapWidget::onToggleColorTraffic(bool val)
     update();
 }
 
+void MapWidget::onToggleModifyClosed(bool val)
+{
+    if(val) modeModifyClosed = true;
+    else modeModifyClosed = false;
+    update();
+}
+
+void MapWidget::onToggleModifyTraffic(bool val)
+{
+    if(val) modeModifyTraffic = true;
+    else modeModifyTraffic = false;
+    update();
+}
+
+void MapWidget::onTimeSliderChange(int val)
+{
+    if(val == 0) timeModifier = 1;
+    if(val == 1) timeModifier = 2;
+    if(val == 2) timeModifier = 3;
+    if(val == 3) timeModifier = 5;
+    if(val == 4) timeModifier = 10;
+    if(val == 5) timeModifier = 20;
+    if(val == 6) timeModifier = 30;
+    if(val == 7) timeModifier = 40;
+    if(val == 8) timeModifier = 50;
+    if(val == 9) timeModifier = 75;
+    if(val == 10) timeModifier = 100;
+
+    //resets internal clock with modified value
+    qDebug() << timeModifier;
+    int clock_time = 30000 / timeModifier;
+    internalClock->start(clock_time);
+    update();
+}
+
+void MapWidget::createTimerMessage()
+{
+    QString msg = "";
+    msg.append("Time modifier: ");
+    msg.append(QString::number(this->timeModifier));
+    msg.append("\n");
+    msg.append("Current time:                  ");
+    msg.append(QString::number(conHandler->currentTime.hour()).rightJustified(2, '0'));
+    msg.append(":");
+    msg.append(QString::number(conHandler->currentTime.minute()).rightJustified(2, '0'));
+    msg.append(":");
+    msg.append(QString::number(conHandler->currentTime.second()).rightJustified(2, '0'));
+    emit TimerMessage(msg);
+}
+
+
 void MapWidget::paintEvent(QPaintEvent *event)
 {
     QPainter p(this);
@@ -85,6 +138,8 @@ void MapWidget::paintEvent(QPaintEvent *event)
 
 
     p.setWindow(QRect(0,0,100,100));
+    //refreshes time message
+    createTimerMessage();
 
     /* TODO figure out
     float scl = 1;
