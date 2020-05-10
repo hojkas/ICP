@@ -14,6 +14,7 @@
 #include <QImage>
 #include <QCheckBox>
 #include <QTimer>
+#include <QtGlobal>
 
 #include "street.h"
 #include "connectionHandler.h"
