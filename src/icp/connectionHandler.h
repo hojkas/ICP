@@ -6,6 +6,7 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QString>
+#include <QTime>
 #include <time.h>
 #include "street.h"
 
@@ -35,18 +36,17 @@ class connectionHandler : public QObject
     Q_OBJECT
 public:
     explicit connectionHandler(QObject *parent = nullptr);
+    QTime currentTime;
     std::list<connectionElem> conList;
     std::list<busElem*> busList;
-signals:
-
-public slots:
     void loadConnections(std::list<Street *> street_list);
-    void printConnections();
     std::tuple<Street*, bool, bool> findStreet(Street* currStreet, std::list<std::tuple<Street*, bool, bool>> streetList, bool next);
-    void internalTimer();
+signals:
+    void busUpdated();
+public slots:
+    void printConnections();
     void busUpdate();
  private:
     int timePassed;
-    int timeSinceUpdate;
 };
 #endif // CONNECTION_H
