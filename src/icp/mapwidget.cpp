@@ -18,6 +18,8 @@ MapWidget::MapWidget(QWidget *parent) : QWidget(parent)
     streetNamesToggled = false;
     streetTimeToggled = false;
     streetIdToggled = false;
+    streetColorTime = false;
+    streetColorTraffic = false;
 
     conHandler = new connectionHandler;
     conHandler->loadConnections(streets->street_list);
@@ -27,14 +29,15 @@ MapWidget::MapWidget(QWidget *parent) : QWidget(parent)
     updateClock = new QTimer(this);
     connect(updateClock, &QTimer::timeout, conHandler, &connectionHandler::printConnections);
     updateClock->start(20000);
+
 }
 
 MapWidget::~MapWidget()
 {
     delete streets;
     delete conHandler;
-    delete internalClock;
-    delete updateClock;
+    //delete internalClock;
+    //delete updateClock;
 }
 
 
@@ -56,6 +59,20 @@ void MapWidget::onToggleStreetTime(bool val)
 {
     if(val) this->streetTimeToggled = true;
     else this->streetTimeToggled = false;
+    update();
+}
+
+void MapWidget::onToggleColorTime(bool val)
+{
+    if(val) this->streetColorTime = true;
+    else this->streetColorTime = false;
+    update();
+}
+
+void MapWidget::onToggleColorTraffic(bool val)
+{
+    if(val) this->streetColorTraffic = true;
+    else this->streetColorTraffic = false;
     update();
 }
 
@@ -87,16 +104,80 @@ void MapWidget::paintEvent(QPaintEvent *event)
     p.drawLine(100,0,100,100);
     p.drawLine(0,100,100,100);
 
+    //This part handles color of streets
     //Formating for street painting
     QPen street_pen = p_pen;
     street_pen.setCapStyle(Qt::RoundCap);
     street_pen.setWidth(3);
     street_pen.setBrush(Qt::gray);
-    p.setPen(street_pen);
 
-    //Street painting (just lines)
-    for(auto const & s : this->streets->street_list) {
-        p.drawLine(s->x1, s->y1, s->x2, s->y2);
+    if(streetColorTime) {
+        //create pens of different colors for different time tiers
+        QPen tier1 = street_pen;
+        tier1.setBrush(QColor(135,201,232));
+        QPen tier2 = street_pen;
+        tier2.setBrush(QColor(91,173,212));
+        QPen tier3 = street_pen;
+        tier3.setBrush(QColor(36,142,191));
+        QPen tier4 = street_pen;
+        tier4.setBrush(QColor(3,111,161));
+        QPen tier5 = street_pen;
+        tier5.setBrush(QColor(2,60,87));
+
+        //loop to draw streets
+        for(auto const & s : this->streets->street_list) {
+            if(s->count_time() < 150) {
+                p.setPen(tier1);
+            }
+            else if(s->count_time() < 250) {
+                p.setPen(tier2);
+            }
+            else if(s->count_time() < 350) {
+                p.setPen(tier3);
+            }
+            else if(s->count_time() < 450) {
+                p.setPen(tier4);
+            }
+            else {
+                p.setPen(tier5);
+            }
+            p.drawLine(s->x1, s->y1, s->x2, s->y2);
+        }
+    }
+    else if(streetColorTraffic) {
+        //Setting up pens to draw traffic tiers
+        QPen tier1 = street_pen;
+        tier1.setBrush(QColor(103,222,29));
+        QPen tier2 = street_pen;
+        tier2.setBrush(QColor(242, 232,46));
+        QPen tier3 = street_pen;
+        tier3.setBrush(QColor(242,183,46));
+        QPen tier4 = street_pen;
+        tier4.setBrush(QColor(230,43,14));
+
+        //loop to draw streets
+        for(auto const & s : this->streets->street_list) {
+            if(s->traffic == 1) {
+                p.setPen(tier1);
+            }
+            else if(s->traffic == 2) {
+                p.setPen(tier2);
+            }
+            else if(s->traffic == 3) {
+                p.setPen(tier3);
+            }
+            else{
+                p.setPen(tier4);
+            }
+            p.drawLine(s->x1, s->y1, s->x2, s->y2);
+        }
+    }
+    else {
+        p.setPen(street_pen);
+        //Street painting grey (just grey lines, default)
+        for(auto const & s : this->streets->street_list) {
+            p.drawLine(s->x1, s->y1, s->x2, s->y2);
+        }
     }
 
     // THis part handles radio buttons about displaying street properties

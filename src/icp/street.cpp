@@ -21,7 +21,7 @@ Street::Street(int x_1, int y_1, int x_2, int y_2, int s_id, int s_time, QString
     id = s_id;
     name = s_name;
     time = s_time;
-    difficulty = 1;
+    traffic = 1;
 }
 
 AllStreets::AllStreets(QObject *parent) : QObject(parent)
@@ -31,7 +31,7 @@ AllStreets::AllStreets(QObject *parent) : QObject(parent)
 
 int Street::count_time()
 {
-    return (this->time * this->difficulty);
+    return (this->time * this->traffic);
 }
 
 /*

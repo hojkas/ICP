@@ -33,7 +33,7 @@
       <item>
        <widget class="QGroupBox" name="groupBox">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -42,6 +42,12 @@
          <size>
           <width>220</width>
           <height>110</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>16777215</height>
          </size>
         </property>
         <property name="title">
@@ -139,6 +145,9 @@
          <property name="text">
           <string>Grey</string>
          </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
         </widget>
         <widget class="QRadioButton" name="radioButton_5">
          <property name="geometry">
@@ -186,7 +195,7 @@
     <item>
      <widget class="MapWidget" name="Map" native="true">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
@@ -251,6 +260,9 @@
     <slot>onToggleStreetNothing(bool)</slot>
     <slot>onToggleStreetId(bool)</slot>
     <slot>onToggleStreetTime(bool)</slot>
+    <slot>onToggleColorGrey(bool)</slot>
+    <slot>onToggleColorTime(bool)</slot>
+    <slot>onToggleColorTraffic(bool)</slot>
    </slots>
   </customwidget>
  </customwidgets>
@@ -301,6 +313,38 @@
     <hint type="destinationlabel">
      <x>534</x>
      <y>174</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radioButton_5</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>Map</receiver>
+   <slot>onToggleColorTime(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>192</x>
+     <y>252</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>588</x>
+     <y>246</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radioButton_6</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>Map</receiver>
+   <slot>onToggleColorTraffic(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>56</x>
+     <y>264</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>654</x>
+     <y>270</y>
     </hint>
    </hints>
   </connection>

@@ -20,8 +20,7 @@ class Street : public QObject
 public:
     int x1, y1, x2, y2;
     QString name;
-    int id, time, difficulty;
-
+    int id, time, traffic;
     explicit Street(QObject *parent = nullptr);
     Street(int x_1, int y_1, int x_2, int y_2, int s_id, int s_time, QString s_name, QObject *parent = nullptr);
     int count_time();

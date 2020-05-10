@@ -25,6 +25,9 @@ private:
     bool streetNamesToggled;
     bool streetIdToggled;
     bool streetTimeToggled;
+    bool streetColorTime;
+    bool streetColorTraffic;
+
     QTimer *internalClock;
 public:
     explicit MapWidget(QWidget *parent = nullptr);
@@ -42,6 +45,9 @@ public slots:
     void onToggleStreetId(bool);
     void onToggleStreetNames(bool);
     void onToggleStreetTime(bool);
+
+    void onToggleColorTime(bool);
+    void onToggleColorTraffic(bool);
 };
 
 #endif // MAPWIDGET_H
