@@ -321,10 +321,35 @@ void MapWidget::paintConnection(QPainter *p)
     //TODO add closed streets option
     if(true) {
         //if there are no closed streets on the connection
+        int conLen = drawConnection->streetList.size();
+        int i = 0;
         for(std::tuple<Street*, bool, bool> streetTouple : drawConnection->streetList) {
             Street* s = std::get<0>(streetTouple);
             bool stop = std::get<2>(streetTouple);
-            p->drawLine(s->x1, s->y1, s->x2, s->y2);
+
+            if(i == 0) {
+                //first street, to draw just a half
+                bool direction = std::get<1>(streetTouple);
+                int x = (s->x1 + s->x2)/2;
+                int y = (s->y1 + s->y2)/2;
+                if(direction) p->drawLine(x, y, s->x2, s->y2);
+                else p->drawLine(x, y, s->x1, s->y1);
+            }
+            else if(i+1 == conLen) {
+                //last street, to draw just half
+                bool direction = std::get<1>(streetTouple);
+                int x = (s->x1 + s->x2)/2;
+                int y = (s->y1 + s->y2)/2;
+                if(direction) p->drawLine(x, y, s->x1, s->y1);
+                else p->drawLine(x, y, s->x2, s->y2);
+            }
+            else {
+                //draw full street
+                p->drawLine(s->x1, s->y1, s->x2, s->y2);
+            }
+
+            //drawing stop if there is one TODO
+            i++;
         }
     }
     else {
@@ -426,7 +451,7 @@ void MapWidget::mouseEventNormal(int x, int y)
     for(busElem* bus : this->conHandler->busList){
         if(bus->onMap) {
             QPoint busXY = QPoint(bus->x, bus->y) - mouseXY;
-            if(busXY.manhattanLength() < 2) {
+            if(busXY.manhattanLength() < 3) {
                 drawConnectionToggle = true;
                 drawConnection = bus->con;
                 return;
