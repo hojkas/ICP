@@ -32,6 +32,7 @@ private:
     bool streetColorTraffic;
     bool modeModifyTraffic;
     bool modeModifyClosed;
+    bool modeModifyTrafficMode;
     int timeModifier;
 
     QTimer *internalClock;
@@ -42,6 +43,11 @@ private:
     void paintBuses(QPainter*);
     void paintStreets(QPainter*);
     void paintStreetInfo(QPainter*);
+
+    //mouse functions
+    void mouseEventModifyTraffic(int x, int y);
+    void mouseEventModifyClosed(int x, int y);
+    void mouseEventNormal(int x, int y);
 
 public:
     explicit MapWidget(QWidget *parent = nullptr);
@@ -67,6 +73,7 @@ public slots:
     void onToggleColorTraffic(bool);
 
     void onToggleModifyTraffic(bool);
+    void onToggleModifyTrafficMode(int);
     void onToggleModifyClosed(bool);
 
     void onTimeSliderChange(int);

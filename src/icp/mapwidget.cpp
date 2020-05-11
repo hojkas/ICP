@@ -22,6 +22,7 @@ MapWidget::MapWidget(QWidget *parent) : QWidget(parent)
     streetColorTraffic = false;
     modeModifyClosed = false;
     modeModifyTraffic = false;
+    modeModifyTrafficMode = false;
     timeModifier = 1;
 
     conHandler = new connectionHandler;
@@ -92,6 +93,12 @@ void MapWidget::onToggleModifyTraffic(bool val)
     update();
 }
 
+void MapWidget::onToggleModifyTrafficMode(int val)
+{
+    if(val) modeModifyTrafficMode = true;
+    else modeModifyTrafficMode = false;
+}
+
 void MapWidget::onTimeSliderChange(int val)
 {
     if(val == 0) timeModifier = 1;
@@ -128,7 +135,6 @@ void MapWidget::createTimerMessage()
     emit TimerMessage(msg);
 }
 
-
 void MapWidget::paintEvent(QPaintEvent *event)
 {
     QPainter p(this);
@@ -136,7 +142,6 @@ void MapWidget::paintEvent(QPaintEvent *event)
     QPen p_pen = p.pen();
     //getting default font
     QFont p_font = p.font();
-
 
     p.setWindow(QRect(0,0,100,100));
     //refreshes time message
@@ -312,5 +317,53 @@ void MapWidget::resizeEvent(QResizeEvent *event)
  */
 void MapWidget::mousePressEvent(QMouseEvent *event)
 {
-    qDebug() << "clicked at" << event->globalX() << ":" << event->globalY();
+    //gets relative position to window coordinates 0-100
+    int relX = (event->pos().x() * 100) / width();
+    int relY = (event->pos().y() * 100) / height();
+
+    if(modeModifyClosed) mouseEventModifyClosed(relX, relY);
+    else if(modeModifyTraffic) mouseEventModifyTraffic(relX, relY);
+    else mouseEventNormal(relX, relY);
+
+    update();
+}
+
+void MapWidget::mouseEventModifyClosed(int x, int y)
+{
+    //create some thing to finish creating elsewhere
+}
+
+/* @brief Function checks if there is street on given coordinates and if so, adjusts traffic level according to current mode.
+ * @param x Coordinate X of where mouse was pressed.
+ * @param y Coordinate Y of where mouse was pressed.
+ */
+void MapWidget::mouseEventModifyTraffic(int x, int y)
+{
+    //check if mouse is close to street (if to more, applies to all)
+    for(auto const & s : this->streets->street_list) {
+        QPointF intersectPoint;
+        int offset = 1; //toleration of click out of line
+        //two lines from line so it works even on line street in similar dirrection
+        QLineF pline(x - offset, y - offset, x + offset, y + offset);
+        QLineF pline2(x-offset, y+offset, x+offset, y-offset);
+        QLineF sline(s->x1, s->y1, s->x2, s->y2);
+        if(sline.intersect(pline, &intersectPoint)==QLineF::BoundedIntersection ||
+                sline.intersect(pline2, &intersectPoint)==QLineF::BoundedIntersection) {
+            if(modeModifyTrafficMode) {
+                //increasing mode of traffic
+                if(s->traffic < 4) s->traffic++;
+                else emit ErrorMessage("Traffic already maxed out on this street.");
+            }
+            else {
+                if(s->traffic > 1) s->traffic--;
+                else emit ErrorMessage("Traffic already at lowest level on this street.");
+            }
+        }
+    }
+}
+
+void MapWidget::mouseEventNormal(int x, int y)
+{
+    //check if mouse is close to bus
+    //if yes, set it and bool to draw it
 }
