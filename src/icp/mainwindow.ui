@@ -368,6 +368,28 @@
           <string>Increase</string>
          </property>
         </widget>
+        <widget class="QPushButton" name="FinishButton">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="geometry">
+          <rect>
+           <x>188</x>
+           <y>80</y>
+           <width>61</width>
+           <height>25</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Finish</string>
+         </property>
+         <property name="default">
+          <bool>false</bool>
+         </property>
+         <property name="flat">
+          <bool>false</bool>
+         </property>
+        </widget>
        </widget>
       </item>
       <item>
@@ -452,7 +474,6 @@
       <property name="focusPolicy">
        <enum>Qt::ClickFocus</enum>
       </property>
-      <zorder></zorder>
      </widget>
     </item>
    </layout>
@@ -493,6 +514,8 @@
    <slots>
     <signal>TimerMessage(QString)</signal>
     <signal>ErrorMessage(QString)</signal>
+    <signal>hideFinishButton()</signal>
+    <signal>showFinishButton()</signal>
     <slot>onToggleStreetNames(bool)</slot>
     <slot>onToggleStreetNothing(bool)</slot>
     <slot>onToggleStreetId(bool)</slot>
@@ -506,6 +529,7 @@
     <slot>onToggleModifyTrafficMode(int)</slot>
     <slot>onResetButtonPress()</slot>
     <slot>onResetAllButtonPress()</slot>
+    <slot>onModifyClosedFinish()</slot>
    </slots>
   </customwidget>
  </customwidgets>
@@ -700,6 +724,54 @@
     <hint type="destinationlabel">
      <x>496</x>
      <y>76</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>FinishButton</sender>
+   <signal>clicked()</signal>
+   <receiver>Map</receiver>
+   <slot>onModifyClosedFinish()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>252</x>
+     <y>460</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>354</x>
+     <y>460</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>Map</sender>
+   <signal>hideFinishButton()</signal>
+   <receiver>FinishButton</receiver>
+   <slot>hide()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>310</x>
+     <y>512</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>238</x>
+     <y>460</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>Map</sender>
+   <signal>showFinishButton()</signal>
+   <receiver>FinishButton</receiver>
+   <slot>show()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>290</x>
+     <y>538</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>210</x>
+     <y>458</y>
     </hint>
    </hints>
   </connection>

@@ -1,6 +1,6 @@
 /**
  * @file mainwindow.cpp
- * @author TODO
+ * @author xstrna14
  * @brief TODO
  * Additional description TODO
  */
@@ -13,6 +13,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    //line to hide finish button on setup
+    ui->FinishButton->hide();
 }
 
 MainWindow::~MainWindow()

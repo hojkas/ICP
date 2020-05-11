@@ -1,6 +1,6 @@
 /**
  * @file mapwidget.cpp
- * @author xstrna14
+ * @author xstrna14, xlebod00
  * @brief TODO
  * Additional description TODO
  */
@@ -26,6 +26,7 @@ MapWidget::MapWidget(QWidget *parent) : QWidget(parent)
     timeModifier = 1;
     drawConnectionToggle = false;
     drawConnection = nullptr;
+    emit hideFinishButton();
     selectedConnectionColor = QColor(122,16,179);
     selectedBusColor = QColor(122,16,179);
 
@@ -37,6 +38,8 @@ MapWidget::MapWidget(QWidget *parent) : QWidget(parent)
     internalClock->start(30000);
     connect(conHandler, &connectionHandler::busUpdated, conHandler, &connectionHandler::printBuses);
     connect(conHandler,&connectionHandler::busUpdated, this, QOverload<>::of(&MapWidget::update));
+
+    emit hideFinishButton();
 }
 
 MapWidget::~MapWidget()
@@ -130,6 +133,16 @@ void MapWidget::onTimeSliderChange(int val)
     internalClock->start(clock_time);
     update();
 }
+
+void MapWidget::onModifyClosedFinish()
+{
+    //check collected data
+    //if good, call sum denis function
+    //if not, error msg
+    //hide finish button
+    //if good, add closed street to some list
+}
+//end of SLOT functions
 
 void MapWidget::createTimerMessage()
 {

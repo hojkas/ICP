@@ -69,6 +69,8 @@ protected:
 signals:
     void TimerMessage(QString);
     void ErrorMessage(QString);
+    void hideFinishButton();
+    void showFinishButton();
 
 public slots:
     void onToggleStreetId(bool);
@@ -84,6 +86,7 @@ public slots:
 
     void onTimeSliderChange(int);
     void onResetButtonPress();
+    void onModifyClosedFinish();
 };
 
 #endif // MAPWIDGET_H
