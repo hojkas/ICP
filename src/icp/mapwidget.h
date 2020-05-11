@@ -39,6 +39,8 @@ private:
 
     bool drawConnectionToggle;
     connectionElem * drawConnection;
+    QColor selectedConnectionColor;
+    QColor selectedBusColor;
 
     void createTimerMessage();
 
@@ -81,6 +83,7 @@ public slots:
     void onToggleModifyClosed(bool);
 
     void onTimeSliderChange(int);
+    void onResetButtonPress();
 };
 
 #endif // MAPWIDGET_H

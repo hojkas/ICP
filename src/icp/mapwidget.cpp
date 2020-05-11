@@ -26,6 +26,8 @@ MapWidget::MapWidget(QWidget *parent) : QWidget(parent)
     timeModifier = 1;
     drawConnectionToggle = false;
     drawConnection = nullptr;
+    selectedConnectionColor = QColor(122,16,179);
+    selectedBusColor = QColor(122,16,179);
 
     conHandler = new connectionHandler;
     conHandler->loadConnections(streets->street_list);
@@ -45,6 +47,14 @@ MapWidget::~MapWidget()
     //delete updateClock;
 }
 
+void MapWidget::onResetButtonPress()
+{
+    conHandler->currentTime.setHMS(0,0,0);
+    for(busElem* bus : this->conHandler->busList){
+        conHandler->resetBus(bus);
+    }
+    update();
+}
 
 void MapWidget::onToggleStreetNames(bool val)
 {
@@ -104,19 +114,18 @@ void MapWidget::onToggleModifyTrafficMode(int val)
 void MapWidget::onTimeSliderChange(int val)
 {
     if(val == 0) timeModifier = 1;
-    if(val == 1) timeModifier = 2;
-    if(val == 2) timeModifier = 3;
-    if(val == 3) timeModifier = 5;
-    if(val == 4) timeModifier = 10;
-    if(val == 5) timeModifier = 20;
-    if(val == 6) timeModifier = 30;
-    if(val == 7) timeModifier = 40;
-    if(val == 8) timeModifier = 50;
-    if(val == 9) timeModifier = 75;
+    if(val == 1) timeModifier = 5;
+    if(val == 2) timeModifier = 15;
+    if(val == 3) timeModifier = 30;
+    if(val == 4) timeModifier = 40;
+    if(val == 5) timeModifier = 50;
+    if(val == 6) timeModifier = 60;
+    if(val == 7) timeModifier = 70;
+    if(val == 8) timeModifier = 80;
+    if(val == 9) timeModifier = 90;
     if(val == 10) timeModifier = 100;
 
     //resets internal clock with modified value
-    qDebug() << timeModifier;
     int clock_time = 30000 / timeModifier;
     internalClock->start(clock_time);
     update();
@@ -127,7 +136,7 @@ void MapWidget::createTimerMessage()
     QString msg = "";
     msg.append("Time modifier: ");
     msg.append(QString::number(this->timeModifier));
-    msg.append("\n");
+    msg.append("x\n");
     msg.append("Current time:                  ");
     msg.append(QString::number(conHandler->currentTime.hour()).rightJustified(2, '0'));
     msg.append(":");
@@ -140,10 +149,6 @@ void MapWidget::createTimerMessage()
 void MapWidget::paintEvent(QPaintEvent *event)
 {
     QPainter p(this);
-    //getting default pen
-    QPen p_pen = p.pen();
-    //getting default font
-    QFont p_font = p.font();
 
     p.setWindow(QRect(0,0,100,100));
     //refreshes time message
@@ -171,6 +176,7 @@ void MapWidget::paintEvent(QPaintEvent *event)
     paintStreetInfo(&p);
     if(drawConnectionToggle) paintConnection(&p);
     paintBuses(&p);
+    event->accept();
 }
 
 /* @brief Help function for paintEvent to draw all streets in color according to flag info
@@ -292,12 +298,23 @@ void MapWidget::paintStreetInfo(QPainter* p)
 void MapWidget::paintBuses(QPainter* p)
 {
     //This part handles painting current position of all buses
-    p->setPen(Qt::NoPen);
     p->setBrush(Qt::black);
 
     //Drawing of curr position of buses
     for(busElem* bus : this->conHandler->busList){
-        if(bus->onMap) p->drawEllipse(QPoint(bus->x, bus->y), 2, 2);
+        if(drawConnectionToggle && drawConnection != nullptr) {
+            //check if bus is on currently drawn connection
+            if(drawConnection->name == bus->con->name) p->setBrush(selectedBusColor);
+            else p->setBrush(Qt::black);
+        }
+        else p->setBrush(Qt::black);
+        if(bus->onMap) {
+            p->setPen(QPen(Qt::black, 1));
+            p->drawEllipse(QPoint(bus->x, bus->y), 2, 2);
+            p->setPen(Qt::NoPen);
+            p->drawEllipse(QPoint(bus->x, bus->y), 2, 2);
+
+        }
     }
 }
 
@@ -315,7 +332,7 @@ void MapWidget::paintConnection(QPainter *p)
     QPen con_pen = QPen();
     con_pen.setCapStyle(Qt::RoundCap);
     con_pen.setWidth(2);
-    con_pen.setBrush(Qt::black);
+    con_pen.setBrush(selectedConnectionColor);
     p->setPen(con_pen);
 
     //TODO add closed streets option
@@ -347,9 +364,11 @@ void MapWidget::paintConnection(QPainter *p)
             }
 
             //drawing stop if there is one
+            qDebug() << "before stop";
             if(stop) {
                 QPen backup = p->pen();
                 p->setPen(Qt::NoPen);
+                p->setBrush(selectedConnectionColor);
                 p->drawRect(x-2, y-2, 4, 4);
                 p->setPen(backup);
             }
