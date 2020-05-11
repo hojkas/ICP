@@ -169,8 +169,8 @@ void MapWidget::paintEvent(QPaintEvent *event)
 
     paintStreets(&p);
     paintStreetInfo(&p);
-    paintBuses(&p);
     if(drawConnectionToggle) paintConnection(&p);
+    paintBuses(&p);
 }
 
 /* @brief Help function for paintEvent to draw all streets in color according to flag info
@@ -326,20 +326,18 @@ void MapWidget::paintConnection(QPainter *p)
         for(std::tuple<Street*, bool, bool> streetTouple : drawConnection->streetList) {
             Street* s = std::get<0>(streetTouple);
             bool stop = std::get<2>(streetTouple);
+            int x = (s->x1 + s->x2)/2;
+            int y = (s->y1 + s->y2)/2;
 
             if(i == 0) {
                 //first street, to draw just a half
                 bool direction = std::get<1>(streetTouple);
-                int x = (s->x1 + s->x2)/2;
-                int y = (s->y1 + s->y2)/2;
                 if(direction) p->drawLine(x, y, s->x2, s->y2);
                 else p->drawLine(x, y, s->x1, s->y1);
             }
             else if(i+1 == conLen) {
                 //last street, to draw just half
                 bool direction = std::get<1>(streetTouple);
-                int x = (s->x1 + s->x2)/2;
-                int y = (s->y1 + s->y2)/2;
                 if(direction) p->drawLine(x, y, s->x1, s->y1);
                 else p->drawLine(x, y, s->x2, s->y2);
             }
@@ -348,7 +346,14 @@ void MapWidget::paintConnection(QPainter *p)
                 p->drawLine(s->x1, s->y1, s->x2, s->y2);
             }
 
-            //drawing stop if there is one TODO
+            //drawing stop if there is one
+            if(stop) {
+                QPen backup = p->pen();
+                p->setPen(Qt::NoPen);
+                p->drawRect(x-2, y-2, 4, 4);
+                p->setPen(backup);
+            }
+
             i++;
         }
     }

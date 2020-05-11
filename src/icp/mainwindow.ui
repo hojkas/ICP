@@ -298,7 +298,7 @@
         <widget class="QLabel" name="label_2">
          <property name="geometry">
           <rect>
-           <x>40</x>
+           <x>70</x>
            <y>60</y>
            <width>67</width>
            <height>21</height>
@@ -311,9 +311,9 @@
         <widget class="QSlider" name="horizontalSlider_2">
          <property name="geometry">
           <rect>
-           <x>110</x>
+           <x>140</x>
            <y>60</y>
-           <width>71</width>
+           <width>41</width>
            <height>21</height>
           </rect>
          </property>
