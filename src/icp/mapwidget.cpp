@@ -24,6 +24,8 @@ MapWidget::MapWidget(QWidget *parent) : QWidget(parent)
     modeModifyTraffic = false;
     modeModifyTrafficMode = false;
     timeModifier = 1;
+    drawConnectionToggle = false;
+    drawConnection = nullptr;
 
     conHandler = new connectionHandler;
     conHandler->loadConnections(streets->street_list);
@@ -168,6 +170,7 @@ void MapWidget::paintEvent(QPaintEvent *event)
     paintStreets(&p);
     paintStreetInfo(&p);
     paintBuses(&p);
+    if(drawConnectionToggle) paintConnection(&p);
 }
 
 /* @brief Help function for paintEvent to draw all streets in color according to flag info
@@ -284,7 +287,7 @@ void MapWidget::paintStreetInfo(QPainter* p)
     }
 }
 
-/* @brief Help function for paintEvent to draw all bus positions
+/* @brief Help function for paintEvent to draw all bus positions.
  */
 void MapWidget::paintBuses(QPainter* p)
 {
@@ -296,6 +299,38 @@ void MapWidget::paintBuses(QPainter* p)
     for(busElem* bus : this->conHandler->busList){
         if(bus->onMap) p->drawEllipse(QPoint(bus->x, bus->y), 2, 2);
     }
+}
+
+/* @brief Help function for paintEvent to draw active bus position.
+ */
+void MapWidget::paintConnection(QPainter *p)
+{
+    //check if drawConnection was succesfully loaded after click
+    if(drawConnection == nullptr) {
+        emit ErrorMessage("Error, connection not found.");
+        return;
+    }
+
+    //Setting up pen
+    QPen con_pen = QPen();
+    con_pen.setCapStyle(Qt::RoundCap);
+    con_pen.setWidth(2);
+    con_pen.setBrush(Qt::black);
+    p->setPen(con_pen);
+
+    //TODO add closed streets option
+    if(true) {
+        //if there are no closed streets on the connection
+        for(std::tuple<Street*, bool, bool> streetTouple : drawConnection->streetList) {
+            Street* s = std::get<0>(streetTouple);
+            bool stop = std::get<2>(streetTouple);
+            p->drawLine(s->x1, s->y1, s->x2, s->y2);
+        }
+    }
+    else {
+        //for closed streets on route
+    }
+
 }
 
 /* @brief Override resizeEvent to ensure the map widget is square after resizing main window.
@@ -321,6 +356,10 @@ void MapWidget::mousePressEvent(QMouseEvent *event)
     int relX = (event->pos().x() * 100) / width();
     int relY = (event->pos().y() * 100) / height();
 
+    //clearing drawings based on previous mouse clicks
+    drawConnection = nullptr;
+    drawConnectionToggle = false;
+
     if(modeModifyClosed) mouseEventModifyClosed(relX, relY);
     else if(modeModifyTraffic) mouseEventModifyTraffic(relX, relY);
     else mouseEventNormal(relX, relY);
@@ -328,6 +367,10 @@ void MapWidget::mousePressEvent(QMouseEvent *event)
     update();
 }
 
+/* @brief Function to handle mouse clicks in mode on modifying closed streets.
+ * @param x Coordinate X of where mouse was pressed.
+ * @param y Coordinate Y of where mouse was pressed.
+ */
 void MapWidget::mouseEventModifyClosed(int x, int y)
 {
     //create some thing to finish creating elsewhere
@@ -349,6 +392,17 @@ void MapWidget::mouseEventModifyTraffic(int x, int y)
         QLineF sline(s->x1, s->y1, s->x2, s->y2);
         if(sline.intersect(pline, &intersectPoint)==QLineF::BoundedIntersection ||
                 sline.intersect(pline2, &intersectPoint)==QLineF::BoundedIntersection) {
+            //Check if there is bus on currently adjusted street, opertaion won't go through
+            bool bus_on_line = false;
+            for(busElem* bus : this->conHandler->busList){
+                if(bus->onMap)
+                    if(bus->curStreet->id == s->id) bus_on_line = true;
+            }
+            if(bus_on_line){
+                emit ErrorMessage("Street traffic level not changed because of bus going through the street.");
+                continue;
+            }
+
             if(modeModifyTrafficMode) {
                 //increasing mode of traffic
                 if(s->traffic < 4) s->traffic++;
@@ -362,8 +416,21 @@ void MapWidget::mouseEventModifyTraffic(int x, int y)
     }
 }
 
+/* @brief Funciton handles mouse event in view mode. Checks if there is bus under press and shows if connection route if it is.
+ * @param x Coordinate X of where mouse was pressed.
+ * @param y Coordinate Y of where mouse was pressed.
+ */
 void MapWidget::mouseEventNormal(int x, int y)
 {
-    //check if mouse is close to bus
-    //if yes, set it and bool to draw it
+    QPoint mouseXY = QPoint(x, y);
+    for(busElem* bus : this->conHandler->busList){
+        if(bus->onMap) {
+            QPoint busXY = QPoint(bus->x, bus->y) - mouseXY;
+            if(busXY.manhattanLength() < 2) {
+                drawConnectionToggle = true;
+                drawConnection = bus->con;
+                return;
+            }
+        }
+    }
 }

@@ -37,12 +37,16 @@ private:
 
     QTimer *internalClock;
 
+    bool drawConnectionToggle;
+    connectionElem * drawConnection;
+
     void createTimerMessage();
 
     //paint functions
     void paintBuses(QPainter*);
     void paintStreets(QPainter*);
     void paintStreetInfo(QPainter*);
+    void paintConnection(QPainter*);
 
     //mouse functions
     void mouseEventModifyTraffic(int x, int y);
