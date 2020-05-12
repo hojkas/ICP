@@ -15,6 +15,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     //line to hide finish button on setup
     ui->FinishButton->hide();
+    ui->DecIncFrame->setVisible(false);
 }
 
 MainWindow::~MainWindow()
