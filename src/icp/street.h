@@ -41,7 +41,10 @@ public:
     ~AllStreets();
 
     std::list<Street*> street_list;
+    std::list<Street*> closed_streets;
     void loadStreets();
+    void addClosedStreet(Street*);
+    void removeClosedStreet(Street*);
 
 signals:
 

@@ -26,7 +26,7 @@ Street::Street(int x_1, int y_1, int x_2, int y_2, int s_id, int s_time, QString
 
 AllStreets::AllStreets(QObject *parent) : QObject(parent)
 {
-
+    closed_streets = std::list<Street*>();
 }
 
 int Street::count_time()
@@ -42,6 +42,16 @@ AllStreets::~AllStreets()
     for(auto const & s : street_list) {
         delete s;
     }
+}
+
+void AllStreets::addClosedStreet(Street *s)
+{
+    closed_streets.push_back(s);
+}
+
+void AllStreets::removeClosedStreet(Street *s)
+{
+    closed_streets.remove(s);
 }
 
 /*

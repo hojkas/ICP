@@ -412,7 +412,7 @@
            <property name="minimumSize">
             <size>
              <width>0</width>
-             <height>20</height>
+             <height>22</height>
             </size>
            </property>
            <property name="frameShape">
@@ -427,9 +427,9 @@
             </property>
             <property name="geometry">
              <rect>
-              <x>95</x>
+              <x>110</x>
               <y>0</y>
-              <width>141</width>
+              <width>131</width>
               <height>21</height>
              </rect>
             </property>
@@ -446,13 +446,26 @@
              </size>
             </property>
             <property name="text">
-             <string>Finish</string>
+             <string>Finish this closure</string>
             </property>
             <property name="default">
              <bool>false</bool>
             </property>
             <property name="flat">
              <bool>false</bool>
+            </property>
+           </widget>
+           <widget class="QPushButton" name="OpenAllButton">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>0</y>
+              <width>111</width>
+              <height>21</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Open all streets</string>
             </property>
            </widget>
           </widget>
@@ -549,6 +562,46 @@
       </property>
      </widget>
     </item>
+    <item>
+     <widget class="QFrame" name="extraInfo">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>200</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Plain</enum>
+      </property>
+      <property name="lineWidth">
+       <number>2</number>
+      </property>
+      <widget class="QWidget" name="verticalLayoutWidget">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>201</width>
+         <height>631</height>
+        </rect>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_5">
+        <property name="sizeConstraint">
+         <enum>QLayout::SetFixedSize</enum>
+        </property>
+       </layout>
+      </widget>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
@@ -590,6 +643,7 @@
     <signal>hideFinishButton()</signal>
     <signal>showFinishButton()</signal>
     <signal>showModifyTrafficOptions(bool)</signal>
+    <signal>showOpenAllOption(bool)</signal>
     <slot>onToggleStreetNames(bool)</slot>
     <slot>onToggleStreetNothing(bool)</slot>
     <slot>onToggleStreetId(bool)</slot>
@@ -712,8 +766,8 @@
    <slot>onToggleModifyTraffic(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>152</x>
-     <y>466</y>
+     <x>168</x>
+     <y>462</y>
     </hint>
     <hint type="destinationlabel">
      <x>296</x>
@@ -777,7 +831,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>166</x>
-     <y>489</y>
+     <y>483</y>
     </hint>
     <hint type="destinationlabel">
      <x>420</x>
@@ -808,8 +862,8 @@
    <slot>onModifyClosedFinish()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>171</x>
-     <y>534</y>
+     <x>187</x>
+     <y>531</y>
     </hint>
     <hint type="destinationlabel">
      <x>354</x>
@@ -828,8 +882,8 @@
      <y>512</y>
     </hint>
     <hint type="destinationlabel">
-     <x>157</x>
-     <y>534</y>
+     <x>173</x>
+     <y>531</y>
     </hint>
    </hints>
   </connection>
@@ -844,8 +898,8 @@
      <y>538</y>
     </hint>
     <hint type="destinationlabel">
-     <x>129</x>
-     <y>532</y>
+     <x>145</x>
+     <y>531</y>
     </hint>
    </hints>
   </connection>
@@ -862,6 +916,22 @@
     <hint type="destinationlabel">
      <x>252</x>
      <y>486</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>Map</sender>
+   <signal>showOpenAllOption(bool)</signal>
+   <receiver>OpenAllButton</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>302</x>
+     <y>572</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>70</x>
+     <y>524</y>
     </hint>
    </hints>
   </connection>

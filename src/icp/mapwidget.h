@@ -33,7 +33,13 @@ private:
     bool modeModifyTraffic;
     bool modeModifyClosed;
     bool modeModifyTrafficMode;
+    bool modeModifyClosedAdd;
     int timeModifier;
+
+    //closed streets edit mode variables
+    bool chosingDetourStreets;
+    Street* closedStreet;
+    std::list<Street*> detourStreets;
 
     QTimer *internalClock;
 
@@ -42,6 +48,7 @@ private:
     QColor selectedConnectionColor;
     QColor selectedBusColor;
 
+    //functions
     void createTimerMessage();
 
     //paint functions
@@ -49,11 +56,13 @@ private:
     void paintStreets(QPainter*);
     void paintStreetInfo(QPainter*);
     void paintConnection(QPainter*);
+    void paintCloseModeInfo(QPainter*);
 
     //mouse functions
     void mouseEventModifyTraffic(int x, int y);
     void mouseEventModifyClosed(int x, int y);
     void mouseEventNormal(int x, int y);
+    Street* findClickedStreet(int x, int y);
 
 public:
     explicit MapWidget(QWidget *parent = nullptr);
@@ -71,6 +80,8 @@ signals:
     void ErrorMessage(QString);
     void hideFinishButton();
     void showFinishButton();
+    void showModifyTrafficOptions(bool);
+    void showOpenAllOption(bool);
 
 public slots:
     void onToggleStreetId(bool);

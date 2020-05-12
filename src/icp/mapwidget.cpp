@@ -26,7 +26,9 @@ MapWidget::MapWidget(QWidget *parent) : QWidget(parent)
     timeModifier = 1;
     drawConnectionToggle = false;
     drawConnection = nullptr;
-    emit hideFinishButton();
+    detourStreets = std::list<Street*>();
+    closedStreet = nullptr;
+    chosingDetourStreets = false;
     selectedConnectionColor = QColor(122,16,179);
     selectedBusColor = QColor(122,16,179);
 
@@ -56,6 +58,8 @@ void MapWidget::onResetButtonPress()
     for(busElem* bus : this->conHandler->busList){
         conHandler->resetBus(bus);
     }
+    //TODO Denis
+    //call your function that just cleans all the closures and sets bools about them to false
     update();
 }
 
@@ -98,6 +102,19 @@ void MapWidget::onToggleModifyClosed(bool val)
 {
     if(val) modeModifyClosed = true;
     else modeModifyClosed = false;
+    //setting or resetting modifyClosed variables
+    if(val) {
+        emit showOpenAllOption(true);
+        emit ErrorMessage("Closed Roads Editor\nClick on road you wish to close.");
+    }
+    else {
+        emit hideFinishButton();
+        emit showOpenAllOption(false);
+        closedStreet = nullptr;
+        detourStreets.clear();
+        chosingDetourStreets = false;
+        emit ErrorMessage("");
+    }
     update();
 }
 
@@ -105,6 +122,8 @@ void MapWidget::onToggleModifyTraffic(bool val)
 {
     if(val) modeModifyTraffic = true;
     else modeModifyTraffic = false;
+    if(val) emit showModifyTrafficOptions(true);
+    else emit showModifyTrafficOptions(false);
     update();
 }
 
@@ -141,6 +160,72 @@ void MapWidget::onModifyClosedFinish()
     //if not, error msg
     //hide finish button
     //if good, add closed street to some list
+    bool allOK = true;
+
+    int startX = closedStreet->x1;
+    int startY = closedStreet->y1;
+    int endX = closedStreet->x2;
+    int endY = closedStreet->y2;
+    bool front = true;
+
+    for(Street *s: detourStreets) {
+        if(front) {
+            //special treatment of first street in detour list
+            if((s->x1 == endX && s->y1 == endY) || (s->x2 == endX && s->y2 == endY)) {
+                //switches end and start point of closure for  easier checking
+                endX = closedStreet->x1;
+                endY = closedStreet->y1;
+                startX = closedStreet->x2;
+                startY = closedStreet->y2;
+            }
+            front = false;
+        }
+        //checks if next street s follows the previous one (at the point that wasn't connected before)
+        if((s->x1 == startX && s->y1 == startY)) {
+            startX = s->x2;
+            startY = s->y2;
+        }
+        else if((s->x2 == startX && s->y2 == startY)) {
+            startX = s->x1;
+            startY = s->y1;
+        }
+        else {
+            emit ErrorMessage("Streets are not continuous detour.");
+            allOK = false;
+            break;
+        }
+    }
+
+    if(allOK && (startX != endX || startY != endY)) {
+        emit ErrorMessage("Detour isn't connected to closed street.");
+        allOK = false;
+    }
+
+    for(busElem* bus : this->conHandler->busList){
+        if(bus->onMap)
+            if(bus->curStreet->id == closedStreet->id) {
+                //bus on line we just want to close
+                emit ErrorMessage("Bus on line that was selected to close, please select another one or wait until there is no bus there.");
+                allOK = false;
+            }
+    }
+
+    if(allOK){
+        streets->addClosedStreet(closedStreet);
+        if(allOK) emit ErrorMessage("Detour added. Press another street if you wish to add another closure.");
+        //TODO Denis
+        //conHandler->functionToCreateClosureOnAllRelevantConnections(closedStreet, detourStreets);
+        //closedStreet: Street*
+        //detourStreets: std::list<Street*>
+    }
+
+    //reseting state
+    chosingDetourStreets = false;
+    closedStreet = nullptr;
+    detourStreets.clear();
+    emit hideFinishButton();
+    emit showOpenAllOption(true);
+    update();
 }
 //end of SLOT functions
 
@@ -186,8 +271,9 @@ void MapWidget::paintEvent(QPaintEvent *event)
 
 
     paintStreets(&p);
-    paintStreetInfo(&p);
+    if(modeModifyClosed) paintCloseModeInfo(&p);
     if(drawConnectionToggle) paintConnection(&p);
+    paintStreetInfo(&p);
     paintBuses(&p);
     event->accept();
 }
@@ -270,6 +356,12 @@ void MapWidget::paintStreets(QPainter* p)
         for(auto const & s : this->streets->street_list) {
             p->drawLine(s->x1, s->y1, s->x2, s->y2);
         }
+    }
+
+    p->setPen(Qt::red);
+    for(Street* c : streets->closed_streets) {
+        p->drawLine(((c->x1+c->x2)/2)-2, ((c->y1+c->y2)/2)-2, ((c->x1+c->x2)/2)+2, ((c->y1+c->y2)/2)+2);
+        p->drawLine(((c->x1+c->x2)/2)+2, ((c->y1+c->y2)/2)-2, ((c->x1+c->x2)/2)-2, ((c->y1+c->y2)/2)+2);
     }
 }
 
@@ -377,7 +469,6 @@ void MapWidget::paintConnection(QPainter *p)
             }
 
             //drawing stop if there is one
-            qDebug() << "before stop";
             if(stop) {
                 QPen backup = p->pen();
                 p->setPen(Qt::NoPen);
@@ -393,6 +484,38 @@ void MapWidget::paintConnection(QPainter *p)
         //for closed streets on route
     }
 
+}
+
+void MapWidget::paintCloseModeInfo(QPainter *p)
+{
+    QPen base = QPen(Qt::black, 3);
+    base.setCapStyle(Qt::RoundCap);
+    QPen closed = QPen(Qt::red, 2);
+    closed.setCapStyle(Qt::RoundCap);
+    QPen detour = QPen(Qt::green, 2);
+    detour.setCapStyle(Qt::RoundCap);
+
+    if(!detourStreets.empty())
+    {
+        //draw detour streets
+        p->setPen(base);
+        for(Street* s: detourStreets) {
+            p->drawLine(s->x1, s->y1, s->x2, s->y2);
+        }
+        p->setPen(detour);
+        for(Street* s: detourStreets) {
+            p->drawLine(s->x1, s->y1, s->x2, s->y2);
+        }
+    }
+
+    if(closedStreet != nullptr)
+    {
+        //draw curr edited closed street
+        p->setPen(base);
+        p->drawLine(closedStreet->x1, closedStreet->y1, closedStreet->x2, closedStreet->y2);
+        p->setPen(closed);
+        p->drawLine(closedStreet->x1, closedStreet->y1, closedStreet->x2, closedStreet->y2);
+    }
 }
 
 /* @brief Override resizeEvent to ensure the map widget is square after resizing main window.
@@ -435,7 +558,53 @@ void MapWidget::mousePressEvent(QMouseEvent *event)
  */
 void MapWidget::mouseEventModifyClosed(int x, int y)
 {
-    //create some thing to finish creating elsewhere
+    if(!chosingDetourStreets) {
+        //means chosing street to close
+        Street* clicked = findClickedStreet(x, y);
+        if(clicked == nullptr) return; //nothing clicked, wait for another event
+        //check if street is not already closed
+        for(Street* s : streets->closed_streets) {
+            if(s == clicked) {
+                emit ErrorMessage("This street is already closed. Chose another one.");
+                return;
+            }
+        }
+
+        for(busElem* bus : this->conHandler->busList){
+            if(bus->onMap)
+                if(bus->curStreet->id == clicked->id) {
+                    //bus on line we just want to close
+                    emit ErrorMessage("Bus on line that was selected to close, please select another one or wait until there is no bus there.");
+                    return;
+                }
+        }
+
+        chosingDetourStreets = true;
+        emit showFinishButton();
+        emit showOpenAllOption(false);
+        emit ErrorMessage("Click streets that should make the detour one by one (must be continuous).");
+        closedStreet = clicked;
+    }
+    else {
+        //means chosing street to close
+        Street* clicked = findClickedStreet(x, y);
+        if(clicked == nullptr) return; //nothing clicked, wait for another event
+        //check if street is not already closed
+        for(Street* s : streets->closed_streets) {
+            if(s == clicked) {
+                emit ErrorMessage("This street is closed and cannot be part of detour route. Chose another one.");
+                return;
+            }
+        }
+
+        for(Street* s : detourStreets) {
+            if(s == clicked) {
+                emit ErrorMessage("This street is already part of detour. Choose another one or start again.");
+                return;
+            }
+        }
+        detourStreets.push_back(clicked);
+    }
 }
 
 /* @brief Function checks if there is street on given coordinates and if so, adjusts traffic level according to current mode.
@@ -495,4 +664,27 @@ void MapWidget::mouseEventNormal(int x, int y)
             }
         }
     }
+}
+
+/* @brief Finds whether street was clicked and if yes, returns its pointer.
+ * @param x Coordinate X of where mouse was pressed.
+ * @param y Coordinate Y of where mouse was pressed.
+ * It creates two help lines creating small cross over given point (x, y). Then it uses these lines to
+ * check if they intersect with street line.
+ */
+Street* MapWidget::findClickedStreet(int x, int y)
+{
+    for(auto const & s : this->streets->street_list) {
+        QPointF intersectPoint;
+        int offset = 1; //toleration of click out of line
+        //two lines from line so it works even on line street in similar dirrection
+        QLineF pline(x - offset, y - offset, x + offset, y + offset);
+        QLineF pline2(x - offset, y + offset, x + offset, y - offset);
+        QLineF sline(s->x1, s->y1, s->x2, s->y2);
+        if(sline.intersect(pline, &intersectPoint)==QLineF::BoundedIntersection ||
+                sline.intersect(pline2, &intersectPoint)==QLineF::BoundedIntersection) {
+            return s;
+        }
+    }
+    return nullptr;
 }
