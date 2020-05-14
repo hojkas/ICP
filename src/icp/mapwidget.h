@@ -64,6 +64,10 @@ private:
     void mouseEventNormal(int x, int y);
     Street* findClickedStreet(int x, int y);
 
+    //zoom/pan variables
+    int zoomLevel;
+    int xPan;
+    int yPan;
 public:
     explicit MapWidget(QWidget *parent = nullptr);
     ~MapWidget();
@@ -74,6 +78,7 @@ protected:
     virtual void paintEvent(QPaintEvent *event) override;
     virtual void resizeEvent(QResizeEvent *event) override;
     virtual void mousePressEvent(QMouseEvent *event) override;
+    virtual void wheelEvent(QWheelEvent *event);
 
 signals:
     void TimerMessage(QString);

@@ -31,6 +31,9 @@ MapWidget::MapWidget(QWidget *parent) : QWidget(parent)
     chosingDetourStreets = false;
     selectedConnectionColor = QColor(122,16,179);
     selectedBusColor = QColor(122,16,179);
+    zoomLevel = 1;
+    xPan = 0;
+    yPan = 0;
 
     conHandler = new connectionHandler;
     conHandler->loadConnections(streets->street_list);
@@ -248,7 +251,10 @@ void MapWidget::paintEvent(QPaintEvent *event)
 {
     QPainter p(this);
 
-    p.setWindow(QRect(0,0,100,100));
+    int zoomValue = 100 - ((zoomLevel-1)*25);
+    p.setWindow(xPan, yPan, zoomValue, zoomValue);
+
+
     //refreshes time message
     createTimerMessage();
 
@@ -687,4 +693,28 @@ Street* MapWidget::findClickedStreet(int x, int y)
         }
     }
     return nullptr;
+}
+
+/* @brief override of wheel event to use it for zooming in and out
+ */
+void MapWidget::wheelEvent(QWheelEvent *event)
+{
+    //zoom zoom
+    if(event->delta() > 0) {
+        //zoom in
+        if(zoomLevel < 4) {
+            zoomLevel++;
+
+        }
+        else return;
+    }
+    else {
+        //zoom out
+        if(zoomLevel > 1) {
+            zoomLevel--;
+        }
+        else return;
+    }
+
+    update();
 }
