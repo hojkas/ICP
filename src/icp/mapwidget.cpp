@@ -31,6 +31,9 @@ MapWidget::MapWidget(QWidget *parent) : QWidget(parent)
     chosingDetourStreets = false;
     selectedConnectionColor = QColor(122,16,179);
     selectedBusColor = QColor(122,16,179);
+    zoomLevel = 1;
+    xPan = 0;
+    yPan = 0;
 
     conHandler = new connectionHandler;
     conHandler->loadConnections(streets->street_list);
@@ -38,7 +41,7 @@ MapWidget::MapWidget(QWidget *parent) : QWidget(parent)
     internalClock = new QTimer(this);
     connect(internalClock, &QTimer::timeout, conHandler, &connectionHandler::busUpdate);
     internalClock->start(30000);
-    connect(conHandler, &connectionHandler::busUpdated, conHandler, &connectionHandler::printBuses);
+    //connect(conHandler, &connectionHandler::busUpdated, conHandler, &connectionHandler::printBuses);
     connect(conHandler,&connectionHandler::busUpdated, this, QOverload<>::of(&MapWidget::update));
 
     emit hideFinishButton();
@@ -120,7 +123,14 @@ void MapWidget::onToggleModifyClosed(bool val)
 
 void MapWidget::onToggleModifyTraffic(bool val)
 {
-    if(val) modeModifyTraffic = true;
+    if(val) {
+        modeModifyTraffic = true;
+        if(drawConnectionToggle) {
+            drawConnection = nullptr;
+            drawConnectionToggle = false;
+            showConnectionInfo(false);
+        }
+    }
     else modeModifyTraffic = false;
     if(val) emit showModifyTrafficOptions(true);
     else emit showModifyTrafficOptions(false);
@@ -129,7 +139,14 @@ void MapWidget::onToggleModifyTraffic(bool val)
 
 void MapWidget::onToggleModifyTrafficMode(int val)
 {
-    if(val) modeModifyTrafficMode = true;
+    if(val) {
+        modeModifyTrafficMode = true;
+        if(drawConnectionToggle) {
+            drawConnection = nullptr;
+            drawConnectionToggle = false;
+            showConnectionInfo(false);
+        }
+    }
     else modeModifyTrafficMode = false;
 }
 
@@ -227,8 +244,99 @@ void MapWidget::onModifyClosedFinish()
     emit showOpenAllOption(true);
     update();
 }
-//end of SLOT functions
 
+//map zoom/pan slot functions ahead
+
+/* @brief Checks if map move arrows should be clickable or not (if the move is possible).
+ */
+void MapWidget::setMapPanButtons()
+{
+    if(xPan > 0) emit allowMapMoveLeft(true);
+    else emit allowMapMoveLeft(false);
+    if(yPan > 0) emit allowMapMoveUp(true);
+    else emit allowMapMoveUp(false);
+
+    int viewWidth = 100 - (zoomLevel-1)*25;
+    if(xPan + viewWidth < 100) emit allowMapMoveRight(true);
+    else emit allowMapMoveRight(false);
+    if(yPan + viewWidth < 100) emit allowMapMoveDown(true);
+    else emit allowMapMoveDown(false);
+}
+
+void MapWidget::onMapZoomChange(int val)
+{
+    if(val == zoomLevel) return; //function called from mousewheelevent, where it was already done
+    if(val < zoomLevel) {
+        //additional adjustment of xPan, yPan points to fit the frame
+        zoomLevel = val;
+        int viewWidth = 100 - (zoomLevel - 1) * 25;
+        if(xPan + viewWidth > 100) xPan = 100 - viewWidth;
+        if(yPan + viewWidth > 100) yPan = 100 - viewWidth;
+
+        xPan -= 12;
+        yPan -= 12;
+        if(xPan < 0) xPan = 0;
+        if(yPan < 0) yPan = 0;
+    }
+    else {
+        zoomLevel = val;
+        xPan += 12;
+        yPan += 12;
+    }
+
+    setMapPanButtons();
+    update();
+}
+
+void MapWidget::onMapMoveRight()
+{
+    int viewWidth = 100 - (zoomLevel - 1) * 25;
+    int step = viewWidth / 5;
+    int newX = xPan + step;
+    if(newX + viewWidth > 100) xPan = 100 - viewWidth;
+    else xPan = newX;
+
+    setMapPanButtons();
+    update();
+}
+
+void MapWidget::onMapMoveLeft()
+{
+    int viewWidth = 100 - (zoomLevel - 1) * 25;
+    int newX = xPan - (viewWidth/5);
+    if(newX < 0) xPan = 0;
+    else xPan = newX;
+
+    setMapPanButtons();
+    update();
+}
+
+void MapWidget::onMapMoveUp()
+{
+    int viewWidth = 100 - (zoomLevel - 1) * 25;
+    int newY = yPan - (viewWidth/5);
+    if(newY < 0) yPan = 0;
+    else yPan = newY;
+
+    setMapPanButtons();
+    update();
+}
+
+void MapWidget::onMapMoveDown()
+{
+    int viewWidth = 100 - (zoomLevel - 1) * 25;
+    int step = viewWidth / 5;
+    int newY = yPan + step;
+    if(newY + viewWidth > 100) yPan = 100 - viewWidth;
+    else yPan = newY;
+
+    setMapPanButtons();
+    update();
+}
+
+//end of SLOT functions
+/*@brief Creates message about current state of time and sends it to widget to draw.
+ */
 void MapWidget::createTimerMessage()
 {
     QString msg = "";
@@ -244,11 +352,143 @@ void MapWidget::createTimerMessage()
     emit TimerMessage(msg);
 }
 
+QString MapWidget::createTimeString(int time)
+{
+    int sec = time % 60;
+    int min = time / 60;
+    int hour = min / 60;
+    min = min % 60;
+
+    QString msg = "";
+    msg.append(QString::number(hour).rightJustified(2, '0'));
+    msg.append(":");
+    msg.append(QString::number(min).rightJustified(2, '0'));
+    msg.append(":");
+    msg.append(QString::number(sec).rightJustified(2, '0'));
+    return msg;
+}
+
+/* @brief Collects all relevant information about currently clicked connection and writes it on Widget.
+ * @param connectionElem* Connection to collect information about.
+ */
+void MapWidget::collectConnectionInfo(connectionElem *con)
+{
+    emit conName(con->name);
+
+    QString msg = "";
+    msg.append(QString::number(conHandler->currentTime.hour()).rightJustified(2, '0'));
+    msg.append(":");
+    msg.append(QString::number(conHandler->currentTime.minute()).rightJustified(2, '0'));
+    msg.append(":");
+    msg.append(QString::number(conHandler->currentTime.second()).rightJustified(2, '0'));
+    emit conGenTime(msg);
+
+    //generating bus departure info
+    msg = "";
+    bool any = false;
+    for(busElem* bus : conHandler->busList) {
+        if(bus->con == con) {
+            any = true;
+            msg.append(createTimeString(bus->departure));
+            if(bus->onMap) msg.append("   (x)\n");
+            else msg.append("\n");
+        }
+    }
+    if(any == false) msg.append("No buses on this connection.\n");
+    emit conBuses(msg);
+
+    //generating General timetable info
+    msg = "";
+    int time = 0;
+    bool first_stop = true;
+    int extra = 0; //for leaving half of street with stop in case it was the last one
+    for(std::tuple<Street*, bool, bool> street : con->streetList) {
+        Street* s = std::get<0>(street);
+        bool stop = std::get<2>(street);
+        if(stop) {
+            //means there is a stop at street
+            if(first_stop) {
+                //means it is the first stop, so we don't add half the street to time
+                extra = (s->time / 2) + s->time % 2;
+                first_stop = false;
+            }
+            else {
+                if(extra != 0) {
+                    time += extra;
+                    extra = 0;
+                }
+                time += (s->time / 2) + (s->time % 2);
+                extra = s->time / 2;
+            }
+            msg.append(createTimeString(time));
+            msg.append("   |   ");
+            if(s->name.isEmpty()) msg.append("<" + QString::number(s->id) + ">");
+            else msg.append(s->name);
+            msg.append("\n");
+        }
+        else {
+            //not stop
+            time += s->time;
+            if(extra != 0) {
+                time += extra;
+                extra = 0;
+            }
+        }
+    }
+    emit conGenTT(msg);
+
+    //generating current timetable info
+    msg = "";
+    time = 0;
+    first_stop = true;
+    extra = 0; //for leaving half of street with stop in case it was the last one
+    for(std::tuple<Street*, bool, bool> street : con->streetList) { //TODO not streetList but detour list
+        Street* s = std::get<0>(street);
+        bool stop = std::get<2>(street);
+        if(stop) {
+            //means there is a stop at street
+            if(first_stop) {
+                //means it is the first stop, so we don't add half the street to time
+                extra = (s->count_time() / 2) + s->count_time() % 2;
+                first_stop = false;
+            }
+            else {
+                if(extra != 0) {
+                    time += extra;
+                    extra = 0;
+                }
+                time += (s->count_time() / 2) + (s->count_time() % 2);
+                extra = s->count_time() / 2;
+            }
+            msg.append(createTimeString(time));
+            msg.append("   |   ");
+            if(s->name.isEmpty()) msg.append("<" + QString::number(s->id) + ">");
+            else msg.append(s->name);
+            msg.append("\n");
+        }
+        else {
+            //not stop
+            time += s->count_time();
+            if(extra != 0) {
+                time += extra;
+                extra = 0;
+            }
+        }
+    }
+    emit conCurTT(msg);
+    //TODO add detour timetable ^^
+
+    showConnectionInfo(true);
+}
+
 void MapWidget::paintEvent(QPaintEvent *event)
 {
     QPainter p(this);
 
-    p.setWindow(QRect(0,0,100,100));
+    int zoomValue = 100 - ((zoomLevel-1)*25);
+    p.setWindow(xPan, yPan, zoomValue, zoomValue);
+
+
     //refreshes time message
     createTimerMessage();
 
@@ -286,7 +526,10 @@ void MapWidget::paintStreets(QPainter* p)
     //Formating for street painting
     QPen street_pen = QPen();
     street_pen.setCapStyle(Qt::RoundCap);
-    street_pen.setWidth(3);
+    if(zoomLevel == 1) street_pen.setWidthF(2.5);
+    else if(zoomLevel == 2) street_pen.setWidthF(2);
+    else if(zoomLevel == 3) street_pen.setWidthF(1.5);
+    else street_pen.setWidth(1);
     street_pen.setBrush(Qt::gray);
 
     if(streetColorTime) {
@@ -358,10 +601,20 @@ void MapWidget::paintStreets(QPainter* p)
         }
     }
 
-    p->setPen(Qt::red);
+    QPen closure_mark = QPen(Qt::red);
+    if(zoomLevel == 1) closure_mark.setWidthF(2.5);
+    else if(zoomLevel == 2) closure_mark.setWidthF(2);
+    else if(zoomLevel == 3) closure_mark.setWidthF(1.5);
+    else closure_mark.setWidth(1);
+    p->setPen(closure_mark);
     for(Street* c : streets->closed_streets) {
-        p->drawLine(((c->x1+c->x2)/2)-2, ((c->y1+c->y2)/2)-2, ((c->x1+c->x2)/2)+2, ((c->y1+c->y2)/2)+2);
-        p->drawLine(((c->x1+c->x2)/2)+2, ((c->y1+c->y2)/2)-2, ((c->x1+c->x2)/2)-2, ((c->y1+c->y2)/2)+2);
+        float offset;
+        if(zoomLevel == 1) offset = 2.0;
+        else if(zoomLevel == 2) offset = 1.7;
+        else if(zoomLevel == 3) offset = 1.4;
+        else offset = 1.1;
+        p->drawLine(QPointF(((c->x1+c->x2)/2)-offset, ((c->y1+c->y2)/2)-offset), QPointF(((c->x1+c->x2)/2)+offset, ((c->y1+c->y2)/2)+offset));
+        p->drawLine(QPointF(((c->x1+c->x2)/2)+offset, ((c->y1+c->y2)/2)-offset), QPointF(((c->x1+c->x2)/2)-offset, ((c->y1+c->y2)/2)+offset));
     }
 }
 
@@ -373,7 +626,11 @@ void MapWidget::paintStreetInfo(QPainter* p)
     if(this->streetNamesToggled || this->streetTimeToggled || this->streetIdToggled) {
         //setting drawing properties for writing street properties (where there are)
         QFont s_name_font = QFont();
-        s_name_font.setPointSize(2);
+        if(zoomLevel == 1) s_name_font.setPointSizeF(1.9);
+        else if(zoomLevel == 2) s_name_font.setPointSizeF(1.7);
+        else if(zoomLevel == 3) s_name_font.setPointSizeF(1.3);
+        else s_name_font.setPointSizeF(1.1);
+
         p->setFont(s_name_font);
         p->setPen(QPen());
         //if it should display name
@@ -392,7 +649,7 @@ void MapWidget::paintStreetInfo(QPainter* p)
         //if it should display time to go through street
         else if(this->streetTimeToggled) {
             for(auto const & s : this->streets->street_list) {
-                p->drawText(((s->x1+s->x2)/2)-1, ((s->y1+s->y2)/2)+1, QString::number(s->time));
+                p->drawText(((s->x1+s->x2)/2)-1, ((s->y1+s->y2)/2)+1, QString::number(s->count_time()));
             }
         }
     }
@@ -405,6 +662,12 @@ void MapWidget::paintBuses(QPainter* p)
     //This part handles painting current position of all buses
     p->setBrush(Qt::black);
 
+    float bus_size;
+    if(zoomLevel == 1) bus_size = 2;
+    else if(zoomLevel == 2) bus_size = 1.7;
+    else if(zoomLevel == 3) bus_size = 1.4;
+    else bus_size = 1.1;
+
     //Drawing of curr position of buses
     for(busElem* bus : this->conHandler->busList){
         if(drawConnectionToggle && drawConnection != nullptr) {
@@ -414,10 +677,11 @@ void MapWidget::paintBuses(QPainter* p)
         }
         else p->setBrush(Qt::black);
         if(bus->onMap) {
-            p->setPen(QPen(Qt::black, 1));
-            p->drawEllipse(QPoint(bus->x, bus->y), 2, 2);
+            if(zoomLevel < 3) p->setPen(QPen(Qt::black, 1));
+            else p->setPen(QPen(Qt::black, 0.5));
+            p->drawEllipse(QPointF(bus->x, bus->y), bus_size, bus_size);
             p->setPen(Qt::NoPen);
-            p->drawEllipse(QPoint(bus->x, bus->y), 2, 2);
+            p->drawEllipse(QPointF(bus->x, bus->y), bus_size, bus_size);
 
         }
     }
@@ -436,7 +700,10 @@ void MapWidget::paintConnection(QPainter *p)
     //Setting up pen
     QPen con_pen = QPen();
     con_pen.setCapStyle(Qt::RoundCap);
-    con_pen.setWidth(2);
+    if(zoomLevel == 1) con_pen.setWidthF(2.5);
+    else if(zoomLevel == 2) con_pen.setWidthF(2);
+    else if(zoomLevel == 3) con_pen.setWidthF(1.5);
+    else con_pen.setWidthF(1);
     con_pen.setBrush(selectedConnectionColor);
     p->setPen(con_pen);
 
@@ -473,7 +740,10 @@ void MapWidget::paintConnection(QPainter *p)
                 QPen backup = p->pen();
                 p->setPen(Qt::NoPen);
                 p->setBrush(selectedConnectionColor);
-                p->drawRect(x-2, y-2, 4, 4);
+                if(zoomLevel == 1) p->drawRect(x-2, y-2, 4, 4);
+                else if(zoomLevel == 2) p->drawRect(QRectF(x-1.7, y-1.7, 3.4, 3.4));
+                else if(zoomLevel == 3) p->drawRect(QRectF(x-1.3, y-1.3, 2.6, 2.6));
+                else p->drawRect(x-1, y-1, 2, 2);
                 p->setPen(backup);
             }
 
@@ -488,12 +758,32 @@ void MapWidget::paintConnection(QPainter *p)
 
 void MapWidget::paintCloseModeInfo(QPainter *p)
 {
-    QPen base = QPen(Qt::black, 3);
+    QPen base = QPen(Qt::black);
+    if(zoomLevel == 1) base.setWidthF(2.6);
+    else if(zoomLevel == 2) base.setWidth(2.1);
+    else if(zoomLevel == 3) base.setWidthF(1.6);
+    else base.setWidthF(1.1);
     base.setCapStyle(Qt::RoundCap);
-    QPen closed = QPen(Qt::red, 2);
+    QPen closed = QPen(Qt::red);
     closed.setCapStyle(Qt::RoundCap);
-    QPen detour = QPen(Qt::green, 2);
+    QPen detour = QPen(Qt::green);
     detour.setCapStyle(Qt::RoundCap);
+    if(zoomLevel == 1) {
+        closed.setWidthF(1.8);
+        detour.setWidthF(1.8);
+    }
+    else if(zoomLevel == 2) {
+        closed.setWidthF(1.3);
+        detour.setWidthF(1.3);
+    }
+    else if(zoomLevel == 3) {
+        closed.setWidthF(1);
+        detour.setWidthF(1);
+    }
+    else {
+        closed.setWidthF(0.7);
+        detour.setWidthF(0.7);
+    }
 
     if(!detourStreets.empty())
     {
@@ -538,12 +828,15 @@ void MapWidget::resizeEvent(QResizeEvent *event)
 void MapWidget::mousePressEvent(QMouseEvent *event)
 {
     //gets relative position to window coordinates 0-100
-    int relX = (event->pos().x() * 100) / width();
-    int relY = (event->pos().y() * 100) / height();
+    int relX = (event->pos().x() * (100 - (zoomLevel-1)*25)) / width() + xPan;
+    int relY = (event->pos().y() * (100 - (zoomLevel-1)*25)) / height() + yPan;
 
     //clearing drawings based on previous mouse clicks
-    drawConnection = nullptr;
-    drawConnectionToggle = false;
+    if(drawConnectionToggle) {
+        drawConnection = nullptr;
+        drawConnectionToggle = false;
+        showConnectionInfo(false);
+    }
 
     if(modeModifyClosed) mouseEventModifyClosed(relX, relY);
     else if(modeModifyTraffic) mouseEventModifyTraffic(relX, relY);
@@ -653,13 +946,14 @@ void MapWidget::mouseEventModifyTraffic(int x, int y)
  */
 void MapWidget::mouseEventNormal(int x, int y)
 {
-    QPoint mouseXY = QPoint(x, y);
+    QPointF mouseXY = QPointF(x, y);
     for(busElem* bus : this->conHandler->busList){
         if(bus->onMap) {
-            QPoint busXY = QPoint(bus->x, bus->y) - mouseXY;
+            QPointF busXY = QPointF(bus->x, bus->y) - mouseXY;
             if(busXY.manhattanLength() < 3) {
                 drawConnectionToggle = true;
                 drawConnection = bus->con;
+                collectConnectionInfo(bus->con);
                 return;
             }
         }
@@ -687,4 +981,40 @@ Street* MapWidget::findClickedStreet(int x, int y)
         }
     }
     return nullptr;
+}
+
+/* @brief override of wheel event to use it for zooming in and out
+ */
+void MapWidget::wheelEvent(QWheelEvent *event)
+{
+    //zoom zoom
+    if(event->delta() > 0) {
+        //zoom in
+        if(zoomLevel < 4) {
+            zoomLevel++;
+            emit adjustMapZoom(zoomLevel);
+            //12 as half the value of change in view (25/12, rounded down)
+            xPan += 12;
+            yPan += 12;
+        }
+        else return;
+    }
+    else {
+        //zoom out
+        if(zoomLevel > 1) {
+            zoomLevel--;
+            emit adjustMapZoom(zoomLevel);
+            int viewWidth = 100 - (zoomLevel - 1) * 25;
+            if(xPan + viewWidth > 100) xPan = 100 - viewWidth;
+            if(yPan + viewWidth > 100) yPan = 100 - viewWidth;
+
+            xPan -= 12;
+            yPan -= 12;
+            if(xPan < 0) xPan = 0;
+            if(yPan < 0) yPan = 0;
+        }
+        else return;
+    }
+    setMapPanButtons();
+    update();
 }

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>836</width>
+    <width>992</width>
     <height>710</height>
    </rect>
   </property>
@@ -560,70 +560,310 @@
       <property name="focusPolicy">
        <enum>Qt::ClickFocus</enum>
       </property>
+      <widget class="QFrame" name="frame_3">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>111</width>
+         <height>111</height>
+        </rect>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <widget class="QPushButton" name="mapUp">
+        <property name="geometry">
+         <rect>
+          <x>50</x>
+          <y>10</y>
+          <width>31</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>▲</string>
+        </property>
+       </widget>
+       <widget class="QSlider" name="mapZoom">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>10</y>
+          <width>20</width>
+          <height>91</height>
+         </rect>
+        </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>4</number>
+        </property>
+        <property name="singleStep">
+         <number>2</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="invertedAppearance">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="mapLeft">
+        <property name="geometry">
+         <rect>
+          <x>30</x>
+          <y>40</y>
+          <width>31</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>◄</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="mapRight">
+        <property name="geometry">
+         <rect>
+          <x>70</x>
+          <y>40</y>
+          <width>31</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>►</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="mapDown">
+        <property name="geometry">
+         <rect>
+          <x>50</x>
+          <y>70</y>
+          <width>31</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>▼</string>
+        </property>
+       </widget>
+      </widget>
      </widget>
     </item>
     <item>
      <widget class="QFrame" name="extraInfo">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+       <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
       <property name="minimumSize">
        <size>
-        <width>200</width>
+        <width>300</width>
         <height>0</height>
        </size>
       </property>
+      <property name="maximumSize">
+       <size>
+        <width>300</width>
+        <height>16777215</height>
+       </size>
+      </property>
       <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
+       <enum>QFrame::NoFrame</enum>
       </property>
       <property name="frameShadow">
        <enum>QFrame::Plain</enum>
       </property>
       <property name="lineWidth">
-       <number>2</number>
+       <number>0</number>
       </property>
-      <widget class="QWidget" name="verticalLayoutWidget">
-       <property name="geometry">
-        <rect>
-         <x>0</x>
-         <y>0</y>
-         <width>201</width>
-         <height>631</height>
-        </rect>
+      <layout class="QVBoxLayout" name="verticalLayout_6">
+       <property name="spacing">
+        <number>2</number>
        </property>
-       <layout class="QVBoxLayout" name="verticalLayout_5">
-        <property name="sizeConstraint">
-         <enum>QLayout::SetFixedSize</enum>
-        </property>
-       </layout>
-      </widget>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="label_4">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>40</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:16pt; font-weight:600;&quot;&gt;Connection:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QTextBrowser" name="textBrowser_3">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>30</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_5">
+         <property name="text">
+          <string>Information generated at: (simulation time)</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QTextBrowser" name="textBrowser_4">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>30</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_6">
+         <property name="text">
+          <string>Bus departure:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QTextBrowser" name="textBrowser_5">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_7">
+         <property name="text">
+          <string>General timetable:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QTextBrowser" name="textBrowser_6">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_8">
+         <property name="text">
+          <string>Current timetable:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QTextBrowser" name="textBrowser_7">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_9">
+         <property name="text">
+          <string>(x) - bus currently on map</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_13">
+         <property name="text">
+          <string>&lt;id&gt; - street without name has id listed</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_10">
+         <property name="inputMethodHints">
+          <set>Qt::ImhMultiLine</set>
+         </property>
+         <property name="text">
+          <string>General timetable doesn't take into</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_11">
+         <property name="text">
+          <string>account traffic changes and closures.</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_12">
+         <property name="text">
+          <string>Current timetable does.</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </widget>
     </item>
    </layout>
-  </widget>
-  <widget class="QToolBar" name="mainToolBar">
-   <property name="sizePolicy">
-    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-     <horstretch>0</horstretch>
-     <verstretch>0</verstretch>
-    </sizepolicy>
-   </property>
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>836</width>
+     <width>992</width>
      <height>22</height>
     </rect>
    </property>
@@ -644,6 +884,21 @@
     <signal>showFinishButton()</signal>
     <signal>showModifyTrafficOptions(bool)</signal>
     <signal>showOpenAllOption(bool)</signal>
+    <signal>adjustMapZoom(int)</signal>
+    <signal>allowMapMoveRight(bool)</signal>
+    <signal>allowMapMoveLeft(bool)</signal>
+    <signal>allowMapMoveUp(bool)</signal>
+    <signal>allowMapMoveDown(bool)</signal>
+    <signal>connectionInfoMessage(QString)</signal>
+    <signal>showConnectionInfo(bool)</signal>
+    <signal>resizeForConnectionInfo(bool)</signal>
+    <signal>resetConnectionInfo()</signal>
+    <signal>resizeExtraInfo(int)</signal>
+    <signal>conName(QString)</signal>
+    <signal>conGenTime(QString)</signal>
+    <signal>conGenTT(QString)</signal>
+    <signal>conCurTT(QString)</signal>
+    <signal>conBuses(QString)</signal>
     <slot>onToggleStreetNames(bool)</slot>
     <slot>onToggleStreetNothing(bool)</slot>
     <slot>onToggleStreetId(bool)</slot>
@@ -658,6 +913,11 @@
     <slot>onResetButtonPress()</slot>
     <slot>onResetAllButtonPress()</slot>
     <slot>onModifyClosedFinish()</slot>
+    <slot>onMapZoomChange(int)</slot>
+    <slot>onMapMoveRight()</slot>
+    <slot>onMapMoveLeft()</slot>
+    <slot>onMapMoveUp()</slot>
+    <slot>onMapMoveDown()</slot>
    </slots>
   </customwidget>
  </customwidgets>
@@ -670,8 +930,8 @@
    <slot>onToggleStreetTime(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>176</x>
-     <y>256</y>
+     <x>192</x>
+     <y>254</y>
     </hint>
     <hint type="destinationlabel">
      <x>534</x>
@@ -686,8 +946,8 @@
    <slot>onTimeSliderChange(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>174</x>
-     <y>147</y>
+     <x>184</x>
+     <y>130</y>
     </hint>
     <hint type="destinationlabel">
      <x>531</x>
@@ -702,8 +962,8 @@
    <slot>onToggleColorTime(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>222</x>
-     <y>354</y>
+     <x>238</x>
+     <y>338</y>
     </hint>
     <hint type="destinationlabel">
      <x>588</x>
@@ -718,8 +978,8 @@
    <slot>onToggleStreetNames(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>121</x>
-     <y>216</y>
+     <x>137</x>
+     <y>208</y>
     </hint>
     <hint type="destinationlabel">
      <x>452</x>
@@ -734,12 +994,12 @@
    <slot>onToggleStreetId(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>121</x>
-     <y>236</y>
+     <x>137</x>
+     <y>231</y>
     </hint>
     <hint type="destinationlabel">
-     <x>542</x>
-     <y>154</y>
+     <x>540</x>
+     <y>152</y>
     </hint>
    </hints>
   </connection>
@@ -750,8 +1010,8 @@
    <slot>onToggleColorTraffic(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>88</x>
-     <y>374</y>
+     <x>104</x>
+     <y>361</y>
     </hint>
     <hint type="destinationlabel">
      <x>654</x>
@@ -766,8 +1026,8 @@
    <slot>onToggleModifyTraffic(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>168</x>
-     <y>462</y>
+     <x>184</x>
+     <y>445</y>
     </hint>
     <hint type="destinationlabel">
      <x>296</x>
@@ -782,8 +1042,8 @@
    <slot>onToggleModifyClosed(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>140</x>
-     <y>501</y>
+     <x>156</x>
+     <y>493</y>
     </hint>
     <hint type="destinationlabel">
      <x>336</x>
@@ -831,7 +1091,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>166</x>
-     <y>483</y>
+     <y>466</y>
     </hint>
     <hint type="destinationlabel">
      <x>420</x>
@@ -846,8 +1106,8 @@
    <slot>onResetButtonPress()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>98</x>
-     <y>54</y>
+     <x>108</x>
+     <y>52</y>
     </hint>
     <hint type="destinationlabel">
      <x>496</x>
@@ -862,8 +1122,8 @@
    <slot>onModifyClosedFinish()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>187</x>
-     <y>531</y>
+     <x>203</x>
+     <y>514</y>
     </hint>
     <hint type="destinationlabel">
      <x>354</x>
@@ -882,8 +1142,8 @@
      <y>512</y>
     </hint>
     <hint type="destinationlabel">
-     <x>173</x>
-     <y>531</y>
+     <x>189</x>
+     <y>514</y>
     </hint>
    </hints>
   </connection>
@@ -898,8 +1158,8 @@
      <y>538</y>
     </hint>
     <hint type="destinationlabel">
-     <x>145</x>
-     <y>531</y>
+     <x>161</x>
+     <y>514</y>
     </hint>
    </hints>
   </connection>
@@ -914,8 +1174,8 @@
      <y>484</y>
     </hint>
     <hint type="destinationlabel">
-     <x>252</x>
-     <y>486</y>
+     <x>263</x>
+     <y>470</y>
     </hint>
    </hints>
   </connection>
@@ -930,10 +1190,269 @@
      <y>572</y>
     </hint>
     <hint type="destinationlabel">
-     <x>70</x>
-     <y>524</y>
+     <x>86</x>
+     <y>514</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mapZoom</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>Map</receiver>
+   <slot>onMapZoomChange(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>288</x>
+     <y>94</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>584</x>
+     <y>104</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>Map</sender>
+   <signal>adjustMapZoom(int)</signal>
+   <receiver>mapZoom</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>608</x>
+     <y>60</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>294</x>
+     <y>78</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mapLeft</sender>
+   <signal>clicked()</signal>
+   <receiver>Map</receiver>
+   <slot>onMapMoveLeft()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>322</x>
+     <y>100</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>606</x>
+     <y>80</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>Map</sender>
+   <signal>allowMapMoveLeft(bool)</signal>
+   <receiver>mapLeft</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>634</x>
+     <y>58</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>337</x>
+     <y>101</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mapRight</sender>
+   <signal>clicked()</signal>
+   <receiver>Map</receiver>
+   <slot>onMapMoveRight()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>360</x>
+     <y>98</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>630</x>
+     <y>78</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mapDown</sender>
+   <signal>clicked()</signal>
+   <receiver>Map</receiver>
+   <slot>onMapMoveDown()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>357</x>
+     <y>131</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>668</x>
+     <y>140</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mapUp</sender>
+   <signal>clicked()</signal>
+   <receiver>Map</receiver>
+   <slot>onMapMoveUp()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>357</x>
+     <y>71</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>668</x>
+     <y>98</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>Map</sender>
+   <signal>allowMapMoveUp(bool)</signal>
+   <receiver>mapUp</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>488</x>
+     <y>60</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>357</x>
+     <y>71</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>Map</sender>
+   <signal>allowMapMoveDown(bool)</signal>
+   <receiver>mapDown</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>518</x>
+     <y>66</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>357</x>
+     <y>131</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>Map</sender>
+   <signal>allowMapMoveRight(bool)</signal>
+   <receiver>mapRight</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>506</x>
+     <y>62</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>370</x>
+     <y>96</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>Map</sender>
+   <signal>showConnectionInfo(bool)</signal>
+   <receiver>extraInfo</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>626</x>
+     <y>412</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>782</x>
+     <y>363</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>Map</sender>
+   <signal>conName(QString)</signal>
+   <receiver>textBrowser_3</receiver>
+   <slot>setPlainText(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>558</x>
+     <y>193</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>982</x>
+     <y>102</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>Map</sender>
+   <signal>conGenTime(QString)</signal>
+   <receiver>textBrowser_4</receiver>
+   <slot>setPlainText(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>514</x>
+     <y>217</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>982</x>
+     <y>153</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>Map</sender>
+   <signal>conBuses(QString)</signal>
+   <receiver>textBrowser_5</receiver>
+   <slot>setPlainText(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>446</x>
+     <y>297</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>982</x>
+     <y>296</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>Map</sender>
+   <signal>conGenTT(QString)</signal>
+   <receiver>textBrowser_6</receiver>
+   <slot>setPlainText(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>500</x>
+     <y>325</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>982</x>
+     <y>440</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>Map</sender>
+   <signal>conCurTT(QString)</signal>
+   <receiver>textBrowser_7</receiver>
+   <slot>setPlainText(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>536</x>
+     <y>521</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>686</x>
+     <y>531</y>
     </hint>
    </hints>
   </connection>
  </connections>
+ <slots>
+  <slot>onResizeForConnectionInfo(bool)</slot>
+ </slots>
 </ui>

@@ -26,8 +26,8 @@ public:
     connectionElem* con;
     int departure;
     int timeOnStreet;
-    int x;
-    int y;
+    float x;
+    float y;
     Street* curStreet;
     bool returning;
     busElem(bool map, connectionElem *connnection, int dep, int tOS, int X, int Y, Street *strt, bool r);
@@ -47,6 +47,7 @@ public:
     std::tuple<Street*, bool, bool> findStreet(Street* currStreet, std::list<std::tuple<Street*, bool, bool>> streetList, bool next);
     void createClosure(Street* closed, std::list<Street*> alternativeStreets);
     std::list<std::tuple<Street*, bool, bool>> updateClosure(Street* closed, std::list<Street*> alternateStreets, auto streetList, connectionElem connection);
+
 signals:
     void busUpdated();
 public slots:

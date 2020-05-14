@@ -50,6 +50,8 @@ private:
 
     //functions
     void createTimerMessage();
+    void collectConnectionInfo(connectionElem*);
+    QString createTimeString(int);
 
     //paint functions
     void paintBuses(QPainter*);
@@ -64,6 +66,11 @@ private:
     void mouseEventNormal(int x, int y);
     Street* findClickedStreet(int x, int y);
 
+    //zoom/pan
+    int zoomLevel;
+    int xPan;
+    int yPan;
+    void setMapPanButtons();
 public:
     explicit MapWidget(QWidget *parent = nullptr);
     ~MapWidget();
@@ -74,6 +81,7 @@ protected:
     virtual void paintEvent(QPaintEvent *event) override;
     virtual void resizeEvent(QResizeEvent *event) override;
     virtual void mousePressEvent(QMouseEvent *event) override;
+    virtual void wheelEvent(QWheelEvent *event);
 
 signals:
     void TimerMessage(QString);
@@ -82,6 +90,20 @@ signals:
     void showFinishButton();
     void showModifyTrafficOptions(bool);
     void showOpenAllOption(bool);
+
+    void showConnectionInfo(bool);
+    void conName(QString);
+    void conGenTime(QString);
+    void conGenTT(QString);
+    void conCurTT(QString);
+    void conBuses(QString);
+
+    //map zoom/pan symbols signals
+    void adjustMapZoom(int);
+    void allowMapMoveRight(bool);
+    void allowMapMoveLeft(bool);
+    void allowMapMoveUp(bool);
+    void allowMapMoveDown(bool);
 
 public slots:
     void onToggleStreetId(bool);
@@ -98,6 +120,13 @@ public slots:
     void onTimeSliderChange(int);
     void onResetButtonPress();
     void onModifyClosedFinish();
+
+    //map zoom/pan slots
+    void onMapZoomChange(int);
+    void onMapMoveRight();
+    void onMapMoveLeft();
+    void onMapMoveUp();
+    void onMapMoveDown();
 };
 
 #endif // MAPWIDGET_H

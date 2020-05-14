@@ -18,6 +18,12 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->DecIncFrame->setVisible(false);
     ui->extraInfo->setVisible(false);
     ui->OpenAllButton->setVisible(false);
+
+    //default disable of map pan buttons
+    ui->mapDown->setEnabled(false);
+    ui->mapUp->setEnabled(false);
+    ui->mapLeft->setEnabled(false);
+    ui->mapRight->setEnabled(false);
 }
 
 MainWindow::~MainWindow()
