@@ -50,6 +50,8 @@ private:
 
     //functions
     void createTimerMessage();
+    void collectConnectionInfo(connectionElem*);
+    QString createTimeString(int);
 
     //paint functions
     void paintBuses(QPainter*);
@@ -88,6 +90,10 @@ signals:
     void showFinishButton();
     void showModifyTrafficOptions(bool);
     void showOpenAllOption(bool);
+
+    void showConnectionInfo(bool);
+    void connectionInfoMessage(QString);
+    void resizeForConnectionInfo(bool);
 
     //map zoom/pan symbols signals
     void adjustMapZoom(int);

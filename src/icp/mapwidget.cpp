@@ -321,7 +321,8 @@ void MapWidget::onMapMoveDown()
 }
 
 //end of SLOT functions
-
+/*@brief Creates message about current state of time and sends it to widget to draw.
+ */
 void MapWidget::createTimerMessage()
 {
     QString msg = "";
@@ -335,6 +336,69 @@ void MapWidget::createTimerMessage()
     msg.append(":");
     msg.append(QString::number(conHandler->currentTime.second()).rightJustified(2, '0'));
     emit TimerMessage(msg);
+}
+
+QString MapWidget::createTimeString(int time)
+{
+    int sec = time % 60;
+    int min = time / 60;
+    int hour = min / 60;
+    min = min % 60;
+
+    QString msg = "";
+    msg.append(QString::number(hour).rightJustified(2, '0'));
+    msg.append(":");
+    msg.append(QString::number(min).rightJustified(2, '0'));
+    msg.append(":");
+    msg.append(QString::number(sec).rightJustified(2, '0'));
+    return msg;
+}
+
+/* @brief Collects all relevant information about currently clicked connection and writes it on Widget.
+ * @param connectionElem* Connection to collect information about.
+ */
+void MapWidget::collectConnectionInfo(connectionElem *con)
+{
+    QString msg = "Connection: ";
+    msg.append(con->name);
+    msg.append("\n[Generated at ");
+    msg.append(QString::number(conHandler->currentTime.hour()).rightJustified(2, '0'));
+    msg.append(":");
+    msg.append(QString::number(conHandler->currentTime.minute()).rightJustified(2, '0'));
+    msg.append(":");
+    msg.append(QString::number(conHandler->currentTime.second()).rightJustified(2, '0'));
+    msg.append(" simulation time]\n- - - - - - - - - - - - - - -\nBuses start at:\n");
+
+    bool any = false;
+    for(busElem* bus : conHandler->busList) {
+        if(bus->con == con) {
+            any = true;
+            msg.append(createTimeString(bus->departure));
+            if(bus->onMap) msg.append(" x\n");
+            else msg.append("\n");
+        }
+    }
+    if(any == false) msg.append("No buses on this connection.\n");
+    msg.append("- - - - - - - - - - - - - - -\nTimetable:");
+
+    int time = 0;
+    int extra = 0; //for leaving half of street with stop in case it was the last one
+    for(std::tuple<Street*, bool, bool> s : con->streetList) {
+        if(std::get<2>(s)) {
+            //means there is a stop at street
+            if(time == 0) {
+                //means it is the first stop, so we take only half of time
+
+            }
+        }
+    }
+
+
+
+    msg.append("\n- - - - - - - - - - - - - - -\nx = currently on map\n");
+    showConnectionInfo(true);
+    emit resizeForConnectionInfo(true);
+    connectionInfoMessage(msg);
 }
 
 void MapWidget::paintEvent(QPaintEvent *event)
@@ -690,8 +754,13 @@ void MapWidget::mousePressEvent(QMouseEvent *event)
     qDebug() << "X: " << relX << " Y: " << relY;
 
     //clearing drawings based on previous mouse clicks
-    drawConnection = nullptr;
-    drawConnectionToggle = false;
+    if(drawConnectionToggle) {
+        drawConnection = nullptr;
+        drawConnectionToggle = false;
+        connectionInfoMessage(QString());
+        showConnectionInfo(false);
+        emit resizeForConnectionInfo(false);
+    }
 
     if(modeModifyClosed) mouseEventModifyClosed(relX, relY);
     else if(modeModifyTraffic) mouseEventModifyTraffic(relX, relY);
@@ -808,6 +877,7 @@ void MapWidget::mouseEventNormal(int x, int y)
             if(busXY.manhattanLength() < 3) {
                 drawConnectionToggle = true;
                 drawConnection = bus->con;
+                collectConnectionInfo(bus->con);
                 return;
             }
         }

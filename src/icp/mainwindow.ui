@@ -658,7 +658,7 @@
     <item>
      <widget class="QFrame" name="extraInfo">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+       <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
@@ -670,29 +670,62 @@
        </size>
       </property>
       <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
+       <enum>QFrame::NoFrame</enum>
       </property>
       <property name="frameShadow">
        <enum>QFrame::Plain</enum>
       </property>
       <property name="lineWidth">
-       <number>2</number>
+       <number>0</number>
       </property>
-      <widget class="QWidget" name="verticalLayoutWidget">
-       <property name="geometry">
-        <rect>
-         <x>0</x>
-         <y>0</y>
-         <width>201</width>
-         <height>631</height>
-        </rect>
+      <layout class="QVBoxLayout" name="verticalLayout_6">
+       <property name="spacing">
+        <number>0</number>
        </property>
-       <layout class="QVBoxLayout" name="verticalLayout_5">
-        <property name="sizeConstraint">
-         <enum>QLayout::SetFixedSize</enum>
-        </property>
-       </layout>
-      </widget>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QTextBrowser" name="connectionInfoText">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>200</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>200</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::NoFrame</enum>
+         </property>
+         <property name="lineWidth">
+          <number>0</number>
+         </property>
+         <property name="sizeAdjustPolicy">
+          <enum>QAbstractScrollArea::AdjustToContents</enum>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </widget>
     </item>
    </layout>
@@ -742,6 +775,11 @@
     <signal>allowMapMoveLeft(bool)</signal>
     <signal>allowMapMoveUp(bool)</signal>
     <signal>allowMapMoveDown(bool)</signal>
+    <signal>connectionInfoMessage(QString)</signal>
+    <signal>showConnectionInfo(bool)</signal>
+    <signal>resizeForConnectionInfo(bool)</signal>
+    <signal>resetConnectionInfo()</signal>
+    <signal>resizeExtraInfo(int)</signal>
     <slot>onToggleStreetNames(bool)</slot>
     <slot>onToggleStreetNothing(bool)</slot>
     <slot>onToggleStreetId(bool)</slot>
@@ -1198,5 +1236,56 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>Map</sender>
+   <signal>showConnectionInfo(bool)</signal>
+   <receiver>extraInfo</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>626</x>
+     <y>412</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>782</x>
+     <y>363</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>Map</sender>
+   <signal>resizeForConnectionInfo(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>onResizeForConnectionInfo(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>472</x>
+     <y>56</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>984</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>Map</sender>
+   <signal>connectionInfoMessage(QString)</signal>
+   <receiver>connectionInfoText</receiver>
+   <slot>setPlainText(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>606</x>
+     <y>314</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>764</x>
+     <y>310</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
+ <slots>
+  <slot>onResizeForConnectionInfo(bool)</slot>
+ </slots>
 </ui>

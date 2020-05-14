@@ -24,6 +24,9 @@ public:
 
 private:
     Ui::MainWindow *ui;
+
+public slots:
+    void onResizeForConnectionInfo(bool);
 };
 
 #endif // MAINWINDOW_H
