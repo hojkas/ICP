@@ -623,8 +623,10 @@ void MapWidget::resizeEvent(QResizeEvent *event)
 void MapWidget::mousePressEvent(QMouseEvent *event)
 {
     //gets relative position to window coordinates 0-100
-    int relX = (event->pos().x() * 100) / width();
-    int relY = (event->pos().y() * 100) / height();
+    int relX = (event->pos().x() * (100 - (zoomLevel-1)*25)) / width() + xPan;
+    int relY = (event->pos().y() * (100 - (zoomLevel-1)*25)) / height() + yPan;
+
+    qDebug() << "X: " << relX << " Y: " << relY;
 
     //clearing drawings based on previous mouse clicks
     drawConnection = nullptr;
