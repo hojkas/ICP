@@ -34,6 +34,7 @@ MapWidget::MapWidget(QWidget *parent) : QWidget(parent)
     zoomLevel = 1;
     xPan = 0;
     yPan = 0;
+    mouseDrag = false;
 
     conHandler = new connectionHandler;
     conHandler->loadConnections(streets->street_list);
@@ -242,6 +243,19 @@ void MapWidget::onModifyClosedFinish()
     detourStreets.clear();
     emit hideFinishButton();
     emit showOpenAllOption(true);
+    update();
+}
+
+void MapWidget::onResetAllButtonPress()
+{
+    streets->closed_streets.clear();
+    chosingDetourStreets = false;
+    closedStreet = nullptr;
+    detourStreets.clear();
+    emit hideFinishButton();
+
+    //TODO Denis dump objizdkove trasy
+
     update();
 }
 
@@ -827,6 +841,17 @@ void MapWidget::resizeEvent(QResizeEvent *event)
  */
 void MapWidget::mousePressEvent(QMouseEvent *event)
 {
+    if(event->button() == Qt::RightButton)
+    {
+        //right mouse button indicates start of dragging to move map, preparing variables
+        mouseDrag = true;
+        dragX = event->x();
+        dragY = event->y();
+        setCursor(Qt::ClosedHandCursor);
+        event->accept();
+        return;
+    }
+
     //gets relative position to window coordinates 0-100
     int relX = (event->pos().x() * (100 - (zoomLevel-1)*25)) / width() + xPan;
     int relY = (event->pos().y() * (100 - (zoomLevel-1)*25)) / height() + yPan;
@@ -1017,4 +1042,31 @@ void MapWidget::wheelEvent(QWheelEvent *event)
     }
     setMapPanButtons();
     update();
+}
+
+/* @brief Function to handle tiding variables after finished map drag.
+ */
+void MapWidget::mouseReleaseEvent(QMouseEvent *event)
+{
+    if(event->button() == Qt::RightButton) {
+        mouseDrag = false;
+        setCursor(Qt::ArrowCursor);
+        event->accept();
+        return;
+    }
+}
+
+/* @brief Function to handle mouse drag as moving map.
+ */
+void MapWidget::mouseMoveEvent(QMouseEvent *event)
+{
+    if(mouseDrag) {
+        qDebug() << "Drag: " << dragX << "/" <<dragY << " -> " <<
+                event->x() << "/" << event->y();
+
+
+        event->accept();
+        update();
+        return;
+    }
 }

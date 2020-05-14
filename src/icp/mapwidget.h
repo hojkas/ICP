@@ -71,6 +71,9 @@ private:
     int xPan;
     int yPan;
     void setMapPanButtons();
+    bool mouseDrag;
+    int dragX;
+    int dragY;
 public:
     explicit MapWidget(QWidget *parent = nullptr);
     ~MapWidget();
@@ -82,6 +85,8 @@ protected:
     virtual void resizeEvent(QResizeEvent *event) override;
     virtual void mousePressEvent(QMouseEvent *event) override;
     virtual void wheelEvent(QWheelEvent *event);
+    virtual void mouseReleaseEvent(QMouseEvent *event) override;
+    virtual void mouseMoveEvent(QMouseEvent *event) override;
 
 signals:
     void TimerMessage(QString);
@@ -119,6 +124,7 @@ public slots:
 
     void onTimeSliderChange(int);
     void onResetButtonPress();
+    void onResetAllButtonPress();
     void onModifyClosedFinish();
 
     //map zoom/pan slots

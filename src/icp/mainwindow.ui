@@ -1451,6 +1451,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>OpenAllButton</sender>
+   <signal>pressed()</signal>
+   <receiver>Map</receiver>
+   <slot>onResetAllButtonPress()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>63</x>
+     <y>512</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>291</x>
+     <y>558</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>onResizeForConnectionInfo(bool)</slot>
