@@ -18,6 +18,11 @@ connectionHandler::connectionHandler(QObject *parent) : QObject(parent)
     timePassed = 0;
 }
 
+connectionHandler::~connectionHandler()
+{
+    for(busElem *bus : busList) delete bus;
+}
+
 void connectionHandler::loadConnections(std::list<Street*> streetList)
 {
     QJsonDocument jsonDocument;
