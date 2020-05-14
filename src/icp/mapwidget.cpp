@@ -230,6 +230,52 @@ void MapWidget::onModifyClosedFinish()
     emit showOpenAllOption(true);
     update();
 }
+
+//map zoom/pan slot functions ahead
+
+/* @brief Checks if map move arrows should be clickable or not (if the move is possible).
+ */
+void MapWidget::setMapPanButtons()
+{
+    if(xPan > 0) emit allowMapMoveLeft(true);
+    else emit allowMapMoveLeft(false);
+    if(yPan > 0) emit allowMapMoveUp(true);
+    else emit allowMapMoveUp(false);
+
+    int viewWidth = 100 - (zoomLevel-1)*25;
+    if(xPan + viewWidth < 100) qDebug() << "yeah";
+    else emit allowMapMoveRight(false);
+    if(yPan + viewWidth < 100) emit allowMapMoveDown(true);
+    else emit allowMapMoveDown(false);
+}
+
+void MapWidget::onMapZoomChange(int val)
+{
+    zoomLevel = val;
+    setMapPanButtons();
+    update();
+}
+
+void MapWidget::onMapMoveRight()
+{
+
+}
+
+void MapWidget::onMapMoveLeft()
+{
+
+}
+
+void MapWidget::onMapMoveUp()
+{
+
+}
+
+void MapWidget::onMapMoveDown()
+{
+
+}
+
 //end of SLOT functions
 
 void MapWidget::createTimerMessage()
@@ -704,7 +750,7 @@ void MapWidget::wheelEvent(QWheelEvent *event)
         //zoom in
         if(zoomLevel < 4) {
             zoomLevel++;
-
+            emit adjustMapZoom(zoomLevel);
         }
         else return;
     }
@@ -712,10 +758,11 @@ void MapWidget::wheelEvent(QWheelEvent *event)
         //zoom out
         if(zoomLevel > 1) {
             zoomLevel--;
+            emit adjustMapZoom(zoomLevel);
 
         }
         else return;
     }
-
+    setMapPanButtons();
     update();
 }

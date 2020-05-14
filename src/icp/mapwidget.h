@@ -64,10 +64,11 @@ private:
     void mouseEventNormal(int x, int y);
     Street* findClickedStreet(int x, int y);
 
-    //zoom/pan variables
+    //zoom/pan
     int zoomLevel;
     int xPan;
     int yPan;
+    void setMapPanButtons();
 public:
     explicit MapWidget(QWidget *parent = nullptr);
     ~MapWidget();
