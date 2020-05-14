@@ -500,9 +500,9 @@ void MapWidget::paintBuses(QPainter* p)
         else p->setBrush(Qt::black);
         if(bus->onMap) {
             p->setPen(QPen(Qt::black, 1));
-            p->drawEllipse(QPoint(bus->x, bus->y), 2, 2);
+            p->drawEllipse(QPointF(bus->x, bus->y), 2, 2);
             p->setPen(Qt::NoPen);
-            p->drawEllipse(QPoint(bus->x, bus->y), 2, 2);
+            p->drawEllipse(QPointF(bus->x, bus->y), 2, 2);
 
         }
     }

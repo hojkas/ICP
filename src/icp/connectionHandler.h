@@ -24,8 +24,8 @@ public:
     connectionElem* con;
     int departure;
     int timeOnStreet;
-    int x;
-    int y;
+    float x;
+    float y;
     Street* curStreet;
     bool returning;
     busElem(bool map, connectionElem *connnection, int dep, int tOS, int X, int Y, Street *strt, bool r);
