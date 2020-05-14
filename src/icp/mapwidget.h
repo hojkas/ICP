@@ -97,7 +97,6 @@ signals:
     void conGenTT(QString);
     void conCurTT(QString);
     void conBuses(QString);
-    void resizeForConnectionInfo(bool);
 
     //map zoom/pan symbols signals
     void adjustMapZoom(int);

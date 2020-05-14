@@ -447,7 +447,7 @@ void MapWidget::collectConnectionInfo(connectionElem *con)
                 extra = s->count_time() / 2;
             }
             msg.append(createTimeString(time));
-            msg.append(" | ");
+            msg.append("   |   ");
             if(s->name.isEmpty()) msg.append("<" + QString::number(s->id) + ">");
             else msg.append(s->name);
             msg.append("\n");
@@ -465,7 +465,6 @@ void MapWidget::collectConnectionInfo(connectionElem *con)
     //TODO add detour timetable ^^
 
     showConnectionInfo(true);
-    emit resizeForConnectionInfo(true);
 }
 
 void MapWidget::paintEvent(QPaintEvent *event)
@@ -823,7 +822,6 @@ void MapWidget::mousePressEvent(QMouseEvent *event)
         drawConnection = nullptr;
         drawConnectionToggle = false;
         showConnectionInfo(false);
-        emit resizeForConnectionInfo(false);
     }
 
     if(modeModifyClosed) mouseEventModifyClosed(relX, relY);
