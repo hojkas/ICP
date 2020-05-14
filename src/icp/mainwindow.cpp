@@ -35,6 +35,5 @@ void MainWindow::onResizeForConnectionInfo(bool val) {
     if(val) resize(width() + 206, height());
     else resize(width() - 206, height());
     //206 -> 200 size of extra info layout + 6 as spacing in curent layout
-    qDebug() << "here";
     update();
 }

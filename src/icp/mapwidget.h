@@ -92,7 +92,11 @@ signals:
     void showOpenAllOption(bool);
 
     void showConnectionInfo(bool);
-    void connectionInfoMessage(QString);
+    void conName(QString);
+    void conGenTime(QString);
+    void conGenTT(QString);
+    void conCurTT(QString);
+    void conBuses(QString);
     void resizeForConnectionInfo(bool);
 
     //map zoom/pan symbols signals

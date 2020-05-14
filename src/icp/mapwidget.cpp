@@ -41,7 +41,7 @@ MapWidget::MapWidget(QWidget *parent) : QWidget(parent)
     internalClock = new QTimer(this);
     connect(internalClock, &QTimer::timeout, conHandler, &connectionHandler::busUpdate);
     internalClock->start(30000);
-    connect(conHandler, &connectionHandler::busUpdated, conHandler, &connectionHandler::printBuses);
+    //connect(conHandler, &connectionHandler::busUpdated, conHandler, &connectionHandler::printBuses);
     connect(conHandler,&connectionHandler::busUpdated, this, QOverload<>::of(&MapWidget::update));
 
     emit hideFinishButton();
@@ -359,46 +359,113 @@ QString MapWidget::createTimeString(int time)
  */
 void MapWidget::collectConnectionInfo(connectionElem *con)
 {
-    QString msg = "Connection: ";
-    msg.append(con->name);
-    msg.append("\n[Generated at ");
+    emit conName(con->name);
+
+    QString msg = "";
     msg.append(QString::number(conHandler->currentTime.hour()).rightJustified(2, '0'));
     msg.append(":");
     msg.append(QString::number(conHandler->currentTime.minute()).rightJustified(2, '0'));
     msg.append(":");
     msg.append(QString::number(conHandler->currentTime.second()).rightJustified(2, '0'));
-    msg.append(" simulation time]\n- - - - - - - - - - - - - - -\nBuses start at:\n");
+    emit conGenTime(msg);
 
+    //generating bus departure info
+    msg = "";
     bool any = false;
     for(busElem* bus : conHandler->busList) {
         if(bus->con == con) {
             any = true;
             msg.append(createTimeString(bus->departure));
-            if(bus->onMap) msg.append(" x\n");
+            if(bus->onMap) msg.append("   (x)\n");
             else msg.append("\n");
         }
     }
     if(any == false) msg.append("No buses on this connection.\n");
-    msg.append("- - - - - - - - - - - - - - -\nTimetable:");
+    emit conBuses(msg);
 
+    //generating General timetable info
+    msg = "";
     int time = 0;
+    bool first_stop = true;
     int extra = 0; //for leaving half of street with stop in case it was the last one
-    for(std::tuple<Street*, bool, bool> s : con->streetList) {
-        if(std::get<2>(s)) {
+    for(std::tuple<Street*, bool, bool> street : con->streetList) {
+        Street* s = std::get<0>(street);
+        bool stop = std::get<2>(street);
+        if(stop) {
             //means there is a stop at street
-            if(time == 0) {
-                //means it is the first stop, so we take only half of time
-
+            if(first_stop) {
+                //means it is the first stop, so we don't add half the street to time
+                extra = (s->time / 2) + s->time % 2;
+                first_stop = false;
+            }
+            else {
+                if(extra != 0) {
+                    time += extra;
+                    extra = 0;
+                }
+                time += (s->time / 2) + (s->time % 2);
+                extra = s->time / 2;
+            }
+            msg.append(createTimeString(time));
+            msg.append("   |   ");
+            if(s->name.isEmpty()) msg.append("<" + QString::number(s->id) + ">");
+            else msg.append(s->name);
+            msg.append("\n");
+        }
+        else {
+            //not stop
+            time += s->time;
+            if(extra != 0) {
+                time += extra;
+                extra = 0;
             }
         }
     }
+    emit conGenTT(msg);
 
+    //generating current timetable info
+    msg = "";
+    time = 0;
+    first_stop = true;
+    extra = 0; //for leaving half of street with stop in case it was the last one
+    for(std::tuple<Street*, bool, bool> street : con->streetList) { //TODO not streetList but detour list
+        Street* s = std::get<0>(street);
+        bool stop = std::get<2>(street);
+        if(stop) {
+            //means there is a stop at street
+            if(first_stop) {
+                //means it is the first stop, so we don't add half the street to time
+                extra = (s->count_time() / 2) + s->count_time() % 2;
+                first_stop = false;
+            }
+            else {
+                if(extra != 0) {
+                    time += extra;
+                    extra = 0;
+                }
+                time += (s->count_time() / 2) + (s->count_time() % 2);
+                extra = s->count_time() / 2;
+            }
+            msg.append(createTimeString(time));
+            msg.append(" | ");
+            if(s->name.isEmpty()) msg.append("<" + QString::number(s->id) + ">");
+            else msg.append(s->name);
+            msg.append("\n");
+        }
+        else {
+            //not stop
+            time += s->count_time();
+            if(extra != 0) {
+                time += extra;
+                extra = 0;
+            }
+        }
+    }
+    emit conCurTT(msg);
+    //TODO add detour timetable ^^
 
-
-    msg.append("\n- - - - - - - - - - - - - - -\nx = currently on map\n");
     showConnectionInfo(true);
     emit resizeForConnectionInfo(true);
-    connectionInfoMessage(msg);
 }
 
 void MapWidget::paintEvent(QPaintEvent *event)
@@ -569,7 +636,7 @@ void MapWidget::paintStreetInfo(QPainter* p)
         //if it should display time to go through street
         else if(this->streetTimeToggled) {
             for(auto const & s : this->streets->street_list) {
-                p->drawText(((s->x1+s->x2)/2)-1, ((s->y1+s->y2)/2)+1, QString::number(s->time));
+                p->drawText(((s->x1+s->x2)/2)-1, ((s->y1+s->y2)/2)+1, QString::number(s->count_time()));
             }
         }
     }
@@ -751,13 +818,10 @@ void MapWidget::mousePressEvent(QMouseEvent *event)
     int relX = (event->pos().x() * (100 - (zoomLevel-1)*25)) / width() + xPan;
     int relY = (event->pos().y() * (100 - (zoomLevel-1)*25)) / height() + yPan;
 
-    qDebug() << "X: " << relX << " Y: " << relY;
-
     //clearing drawings based on previous mouse clicks
     if(drawConnectionToggle) {
         drawConnection = nullptr;
         drawConnectionToggle = false;
-        connectionInfoMessage(QString());
         showConnectionInfo(false);
         emit resizeForConnectionInfo(false);
     }
