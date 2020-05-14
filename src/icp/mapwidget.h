@@ -110,7 +110,15 @@ signals:
     void allowMapMoveUp(bool);
     void allowMapMoveDown(bool);
 
+    //quickguide selection
+    void show1(bool);
+    void show0(bool);
+    void show2(bool);
+    void show3(bool);
+    void show4(bool);
+
 public slots:
+    void onQuickguideSelection(int);
     void onToggleStreetId(bool);
     void onToggleStreetNames(bool);
     void onToggleStreetTime(bool);

@@ -56,6 +56,20 @@ MapWidget::~MapWidget()
     //delete updateClock;
 }
 
+void MapWidget::onQuickguideSelection(int val)
+{
+    if(val == 0) emit show0(true);
+    else emit show0(false);
+    if(val == 1) emit show1(true);
+    else emit show1(false);
+    if(val == 2) emit show2(true);
+    else emit show2(false);
+    if(val == 3) emit show3(true);
+    else emit show3(false);
+    if(val == 4) emit show4(true);
+    else emit show4(false);
+}
+
 void MapWidget::onResetButtonPress()
 {
     conHandler->currentTime.setHMS(0,0,0);

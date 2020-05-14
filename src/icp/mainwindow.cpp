@@ -24,6 +24,12 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->mapUp->setEnabled(false);
     ui->mapLeft->setEnabled(false);
     ui->mapRight->setEnabled(false);
+
+    //hide quickguide and some members
+    ui->Time->setVisible(false);
+    ui->MoveZoom->setVisible(false);
+    ui->TrafficEdit->setVisible(false);
+    ui->ClosedEdit->setVisible(false);
 }
 
 MainWindow::~MainWindow()
