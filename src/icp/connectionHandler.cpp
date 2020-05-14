@@ -40,6 +40,7 @@ void connectionHandler::loadConnections(std::list<Street*> streetList)
         connectionElem con;
         QJsonObject obj = jArray[i].toObject();
         con.name = obj["name"].toString();
+        con.closure = false;
         QJsonArray streetArray = obj["streets"].toArray();
         for(int a = 0; a < streetArray.size(); a++){
             int streetID = streetArray[a].toObject()["id"].toInt();
@@ -155,4 +156,41 @@ void connectionHandler::busUpdate(){
         }
     }
     emit busUpdated();
+}
+
+void connectionHandler::createClosure(Street* closed, std::list<Street*> alternativeStreets)
+{
+    for(connectionElem connection : conList){
+        connectionElem* conPtr = &connection;
+        for(auto streetTuple : connection.streetList){
+            Street *street = std::get<0>(streetTuple);
+            if(street == closed){
+                if(connection.closure){
+                    conPtr->alternateStreets = this->updateClosure(closed, alternativeStreets, connection.alternateStreets, connection);
+                }
+                else{
+                    conPtr->closure = true;
+                    conPtr->alternateStreets = this->updateClosure(closed, alternativeStreets, connection.streetList, connection);
+                }
+            }
+
+        }
+    }
+}
+
+std::list<std::tuple<Street*, bool, bool>> connectionHandler::updateClosure(Street* closed, std::list<Street*> alternateStreets, auto streetList, connectionElem connection)
+{
+    Street *prevStreet;
+    bool prevDirection;
+    bool prevReturning;
+    for(auto i = begin(streetList); i!= end(streetList);){
+        auto streetTuple = *i;
+        Street *street = std::get<0>(streetTuple);
+        bool direction = std::get<1>(streetTuple);
+        bool returning = std::get<2>(streetTuple);
+
+        if((direction && !returning ) || (!direction && returning)){
+
+            }
+    }
 }

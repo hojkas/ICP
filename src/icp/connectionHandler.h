@@ -15,6 +15,8 @@ class connectionElem
 public:
     QString name;
     std::list<std::tuple<Street*, bool, bool>> streetList;
+    bool closure;
+    std::list<std::tuple<Street*, bool, bool>> alternateStreets;
 };
 
 class busElem
@@ -41,7 +43,10 @@ public:
     std::list<busElem*> busList;
     void loadConnections(std::list<Street *> street_list);
     void resetBus(busElem* bus);
+    auto createAltRoute(std::list<Street*> altStreets, connectionElem *connection, Street* closed);
     std::tuple<Street*, bool, bool> findStreet(Street* currStreet, std::list<std::tuple<Street*, bool, bool>> streetList, bool next);
+    void createClosure(Street* closed, std::list<Street*> alternativeStreets);
+    std::list<std::tuple<Street*, bool, bool>> updateClosure(Street* closed, std::list<Street*> alternateStreets, auto streetList, connectionElem connection);
 signals:
     void busUpdated();
 public slots:
