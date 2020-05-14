@@ -251,14 +251,25 @@ void MapWidget::setMapPanButtons()
 
 void MapWidget::onMapZoomChange(int val)
 {
+    if(val == zoomLevel) return; //function called from mousewheelevent, where it was already done
     if(val < zoomLevel) {
         //additional adjustment of xPan, yPan points to fit the frame
         zoomLevel = val;
         int viewWidth = 100 - (zoomLevel - 1) * 25;
         if(xPan + viewWidth > 100) xPan = 100 - viewWidth;
         if(yPan + viewWidth > 100) yPan = 100 - viewWidth;
+
+        xPan -= 12;
+        yPan -= 12;
+        if(xPan < 0) xPan = 0;
+        if(yPan < 0) yPan = 0;
     }
-    else zoomLevel = val;
+    else {
+        zoomLevel = val;
+        xPan += 12;
+        yPan += 12;
+    }
+
     setMapPanButtons();
     update();
 }
@@ -371,7 +382,10 @@ void MapWidget::paintStreets(QPainter* p)
     //Formating for street painting
     QPen street_pen = QPen();
     street_pen.setCapStyle(Qt::RoundCap);
-    street_pen.setWidth(3);
+    if(zoomLevel == 1) street_pen.setWidthF(2.5);
+    else if(zoomLevel == 2) street_pen.setWidthF(2);
+    else if(zoomLevel == 3) street_pen.setWidthF(1.5);
+    else street_pen.setWidth(1);
     street_pen.setBrush(Qt::gray);
 
     if(streetColorTime) {
@@ -443,10 +457,20 @@ void MapWidget::paintStreets(QPainter* p)
         }
     }
 
-    p->setPen(Qt::red);
+    QPen closure_mark = QPen(Qt::red);
+    if(zoomLevel == 1) closure_mark.setWidthF(2.5);
+    else if(zoomLevel == 2) closure_mark.setWidthF(2);
+    else if(zoomLevel == 3) closure_mark.setWidthF(1.5);
+    else closure_mark.setWidth(1);
+    p->setPen(closure_mark);
     for(Street* c : streets->closed_streets) {
-        p->drawLine(((c->x1+c->x2)/2)-2, ((c->y1+c->y2)/2)-2, ((c->x1+c->x2)/2)+2, ((c->y1+c->y2)/2)+2);
-        p->drawLine(((c->x1+c->x2)/2)+2, ((c->y1+c->y2)/2)-2, ((c->x1+c->x2)/2)-2, ((c->y1+c->y2)/2)+2);
+        float offset;
+        if(zoomLevel == 1) offset = 2.0;
+        else if(zoomLevel == 2) offset = 1.7;
+        else if(zoomLevel == 3) offset = 1.4;
+        else offset = 1.1;
+        p->drawLine(QPointF(((c->x1+c->x2)/2)-offset, ((c->y1+c->y2)/2)-offset), QPointF(((c->x1+c->x2)/2)+offset, ((c->y1+c->y2)/2)+offset));
+        p->drawLine(QPointF(((c->x1+c->x2)/2)+offset, ((c->y1+c->y2)/2)-offset), QPointF(((c->x1+c->x2)/2)-offset, ((c->y1+c->y2)/2)+offset));
     }
 }
 
@@ -458,7 +482,11 @@ void MapWidget::paintStreetInfo(QPainter* p)
     if(this->streetNamesToggled || this->streetTimeToggled || this->streetIdToggled) {
         //setting drawing properties for writing street properties (where there are)
         QFont s_name_font = QFont();
-        s_name_font.setPointSize(2);
+        if(zoomLevel == 1) s_name_font.setPointSizeF(1.9);
+        else if(zoomLevel == 2) s_name_font.setPointSizeF(1.7);
+        else if(zoomLevel == 3) s_name_font.setPointSizeF(1.3);
+        else s_name_font.setPointSizeF(1.1);
+
         p->setFont(s_name_font);
         p->setPen(QPen());
         //if it should display name
@@ -490,6 +518,12 @@ void MapWidget::paintBuses(QPainter* p)
     //This part handles painting current position of all buses
     p->setBrush(Qt::black);
 
+    float bus_size;
+    if(zoomLevel == 1) bus_size = 2;
+    else if(zoomLevel == 2) bus_size = 1.7;
+    else if(zoomLevel == 3) bus_size = 1.4;
+    else bus_size = 1.1;
+
     //Drawing of curr position of buses
     for(busElem* bus : this->conHandler->busList){
         if(drawConnectionToggle && drawConnection != nullptr) {
@@ -499,10 +533,11 @@ void MapWidget::paintBuses(QPainter* p)
         }
         else p->setBrush(Qt::black);
         if(bus->onMap) {
-            p->setPen(QPen(Qt::black, 1));
-            p->drawEllipse(QPointF(bus->x, bus->y), 2, 2);
+            if(zoomLevel < 3) p->setPen(QPen(Qt::black, 1));
+            else p->setPen(QPen(Qt::black, 0.5));
+            p->drawEllipse(QPointF(bus->x, bus->y), bus_size, bus_size);
             p->setPen(Qt::NoPen);
-            p->drawEllipse(QPointF(bus->x, bus->y), 2, 2);
+            p->drawEllipse(QPointF(bus->x, bus->y), bus_size, bus_size);
 
         }
     }
@@ -521,7 +556,10 @@ void MapWidget::paintConnection(QPainter *p)
     //Setting up pen
     QPen con_pen = QPen();
     con_pen.setCapStyle(Qt::RoundCap);
-    con_pen.setWidth(2);
+    if(zoomLevel == 1) con_pen.setWidthF(2.5);
+    else if(zoomLevel == 2) con_pen.setWidthF(2);
+    else if(zoomLevel == 3) con_pen.setWidthF(1.5);
+    else con_pen.setWidthF(1);
     con_pen.setBrush(selectedConnectionColor);
     p->setPen(con_pen);
 
@@ -558,7 +596,10 @@ void MapWidget::paintConnection(QPainter *p)
                 QPen backup = p->pen();
                 p->setPen(Qt::NoPen);
                 p->setBrush(selectedConnectionColor);
-                p->drawRect(x-2, y-2, 4, 4);
+                if(zoomLevel == 1) p->drawRect(x-2, y-2, 4, 4);
+                else if(zoomLevel == 2) p->drawRect(QRectF(x-1.7, y-1.7, 3.4, 3.4));
+                else if(zoomLevel == 3) p->drawRect(QRectF(x-1.3, y-1.3, 2.6, 2.6));
+                else p->drawRect(x-1, y-1, 2, 2);
                 p->setPen(backup);
             }
 
@@ -573,12 +614,32 @@ void MapWidget::paintConnection(QPainter *p)
 
 void MapWidget::paintCloseModeInfo(QPainter *p)
 {
-    QPen base = QPen(Qt::black, 3);
+    QPen base = QPen(Qt::black);
+    if(zoomLevel == 1) base.setWidthF(2.6);
+    else if(zoomLevel == 2) base.setWidth(2.1);
+    else if(zoomLevel == 3) base.setWidthF(1.6);
+    else base.setWidthF(1.1);
     base.setCapStyle(Qt::RoundCap);
-    QPen closed = QPen(Qt::red, 2);
+    QPen closed = QPen(Qt::red);
     closed.setCapStyle(Qt::RoundCap);
-    QPen detour = QPen(Qt::green, 2);
+    QPen detour = QPen(Qt::green);
     detour.setCapStyle(Qt::RoundCap);
+    if(zoomLevel == 1) {
+        closed.setWidthF(1.8);
+        detour.setWidthF(1.8);
+    }
+    else if(zoomLevel == 2) {
+        closed.setWidthF(1.3);
+        detour.setWidthF(1.3);
+    }
+    else if(zoomLevel == 3) {
+        closed.setWidthF(1);
+        detour.setWidthF(1);
+    }
+    else {
+        closed.setWidthF(0.7);
+        detour.setWidthF(0.7);
+    }
 
     if(!detourStreets.empty())
     {
@@ -740,10 +801,10 @@ void MapWidget::mouseEventModifyTraffic(int x, int y)
  */
 void MapWidget::mouseEventNormal(int x, int y)
 {
-    QPoint mouseXY = QPoint(x, y);
+    QPointF mouseXY = QPointF(x, y);
     for(busElem* bus : this->conHandler->busList){
         if(bus->onMap) {
-            QPoint busXY = QPoint(bus->x, bus->y) - mouseXY;
+            QPointF busXY = QPointF(bus->x, bus->y) - mouseXY;
             if(busXY.manhattanLength() < 3) {
                 drawConnectionToggle = true;
                 drawConnection = bus->con;
@@ -786,6 +847,9 @@ void MapWidget::wheelEvent(QWheelEvent *event)
         if(zoomLevel < 4) {
             zoomLevel++;
             emit adjustMapZoom(zoomLevel);
+            //12 as half the value of change in view (25/12, rounded down)
+            xPan += 12;
+            yPan += 12;
         }
         else return;
     }
@@ -794,13 +858,17 @@ void MapWidget::wheelEvent(QWheelEvent *event)
         if(zoomLevel > 1) {
             zoomLevel--;
             emit adjustMapZoom(zoomLevel);
-            //additional adjustment of xPan, yPan points to fit the frame
             int viewWidth = 100 - (zoomLevel - 1) * 25;
             if(xPan + viewWidth > 100) xPan = 100 - viewWidth;
             if(yPan + viewWidth > 100) yPan = 100 - viewWidth;
+
+            xPan -= 12;
+            yPan -= 12;
+            if(xPan < 0) xPan = 0;
+            if(yPan < 0) yPan = 0;
         }
         else return;
     }
-
+    setMapPanButtons();
     update();
 }
