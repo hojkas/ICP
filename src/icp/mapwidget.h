@@ -68,8 +68,8 @@ private:
 
     //zoom/pan
     int zoomLevel;
-    int xPan;
-    int yPan;
+    float xPan;
+    float yPan;
     void setMapPanButtons();
     bool mouseDrag;
     int dragX;

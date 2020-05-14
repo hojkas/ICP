@@ -1052,6 +1052,7 @@ void MapWidget::mouseReleaseEvent(QMouseEvent *event)
         mouseDrag = false;
         setCursor(Qt::ArrowCursor);
         event->accept();
+        setMapPanButtons();
         return;
     }
 }
@@ -1061,10 +1062,25 @@ void MapWidget::mouseReleaseEvent(QMouseEvent *event)
 void MapWidget::mouseMoveEvent(QMouseEvent *event)
 {
     if(mouseDrag) {
-        qDebug() << "Drag: " << dragX << "/" <<dragY << " -> " <<
-                event->x() << "/" << event->y();
+        int viewWidth = 100 - (zoomLevel - 1) * 25;
+        int smooth = 1;
+        if(zoomLevel == 2) smooth = 3;
+        else if(zoomLevel == 3) smooth = 6;
+        else if(zoomLevel == 4) smooth = 9;
+        float newX = xPan + (dragX - event->x())/smooth;
+        float newY = yPan + (dragY - event->y())/smooth;
 
+        //checks if newX/Y wound't cause view to go outside the map
+        if(newX + viewWidth > 100) newX = 100 - viewWidth;
+        if(newY + viewWidth > 100) newY = 100 - viewWidth;
+        if(newX < 0) newX = 0;
+        if(newY < 0) newY = 0;
 
+        xPan = newX;
+        yPan = newY;
+
+        dragX = event->x();
+        dragY = event->y();
         event->accept();
         update();
         return;
