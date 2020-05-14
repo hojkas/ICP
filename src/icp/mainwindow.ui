@@ -1065,8 +1065,8 @@
      <y>60</y>
     </hint>
     <hint type="destinationlabel">
-     <x>284</x>
-     <y>88</y>
+     <x>294</x>
+     <y>78</y>
     </hint>
    </hints>
   </connection>
@@ -1126,7 +1126,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>342</x>
-     <y>162</y>
+     <y>142</y>
     </hint>
     <hint type="destinationlabel">
      <x>668</x>
@@ -1178,7 +1178,23 @@
     </hint>
     <hint type="destinationlabel">
      <x>336</x>
-     <y>152</y>
+     <y>132</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>Map</sender>
+   <signal>allowMapMoveRight(bool)</signal>
+   <receiver>mapRight</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>506</x>
+     <y>62</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>370</x>
+     <y>96</y>
     </hint>
    </hints>
   </connection>

@@ -243,7 +243,7 @@ void MapWidget::setMapPanButtons()
     else emit allowMapMoveUp(false);
 
     int viewWidth = 100 - (zoomLevel-1)*25;
-    if(xPan + viewWidth < 100) qDebug() << "yeah";
+    if(xPan + viewWidth < 100) emit allowMapMoveRight(true);
     else emit allowMapMoveRight(false);
     if(yPan + viewWidth < 100) emit allowMapMoveDown(true);
     else emit allowMapMoveDown(false);
@@ -251,29 +251,62 @@ void MapWidget::setMapPanButtons()
 
 void MapWidget::onMapZoomChange(int val)
 {
-    zoomLevel = val;
+    if(val < zoomLevel) {
+        //additional adjustment of xPan, yPan points to fit the frame
+        zoomLevel = val;
+        int viewWidth = 100 - (zoomLevel - 1) * 25;
+        if(xPan + viewWidth > 100) xPan = 100 - viewWidth;
+        if(yPan + viewWidth > 100) yPan = 100 - viewWidth;
+    }
+    else zoomLevel = val;
     setMapPanButtons();
     update();
 }
 
 void MapWidget::onMapMoveRight()
 {
+    int viewWidth = 100 - (zoomLevel - 1) * 25;
+    int step = viewWidth / 5;
+    int newX = xPan + step;
+    if(newX + viewWidth > 100) xPan = 100 - viewWidth;
+    else xPan = newX;
 
+    setMapPanButtons();
+    update();
 }
 
 void MapWidget::onMapMoveLeft()
 {
+    int viewWidth = 100 - (zoomLevel - 1) * 25;
+    int newX = xPan - (viewWidth/5);
+    if(newX < 0) xPan = 0;
+    else xPan = newX;
 
+    setMapPanButtons();
+    update();
 }
 
 void MapWidget::onMapMoveUp()
 {
+    int viewWidth = 100 - (zoomLevel - 1) * 25;
+    int newY = yPan - (viewWidth/5);
+    if(newY < 0) yPan = 0;
+    else yPan = newY;
 
+    setMapPanButtons();
+    update();
 }
 
 void MapWidget::onMapMoveDown()
 {
+    int viewWidth = 100 - (zoomLevel - 1) * 25;
+    int step = viewWidth / 5;
+    int newY = yPan + step;
+    if(newY + viewWidth > 100) yPan = 100 - viewWidth;
+    else yPan = newY;
 
+    setMapPanButtons();
+    update();
 }
 
 //end of SLOT functions
@@ -759,10 +792,13 @@ void MapWidget::wheelEvent(QWheelEvent *event)
         if(zoomLevel > 1) {
             zoomLevel--;
             emit adjustMapZoom(zoomLevel);
-
+            //additional adjustment of xPan, yPan points to fit the frame
+            int viewWidth = 100 - (zoomLevel - 1) * 25;
+            if(xPan + viewWidth > 100) xPan = 100 - viewWidth;
+            if(yPan + viewWidth > 100) yPan = 100 - viewWidth;
         }
         else return;
     }
-    setMapPanButtons();
+
     update();
 }
