@@ -123,7 +123,14 @@ void MapWidget::onToggleModifyClosed(bool val)
 
 void MapWidget::onToggleModifyTraffic(bool val)
 {
-    if(val) modeModifyTraffic = true;
+    if(val) {
+        modeModifyTraffic = true;
+        if(drawConnectionToggle) {
+            drawConnection = nullptr;
+            drawConnectionToggle = false;
+            showConnectionInfo(false);
+        }
+    }
     else modeModifyTraffic = false;
     if(val) emit showModifyTrafficOptions(true);
     else emit showModifyTrafficOptions(false);
@@ -132,7 +139,14 @@ void MapWidget::onToggleModifyTraffic(bool val)
 
 void MapWidget::onToggleModifyTrafficMode(int val)
 {
-    if(val) modeModifyTrafficMode = true;
+    if(val) {
+        modeModifyTrafficMode = true;
+        if(drawConnectionToggle) {
+            drawConnection = nullptr;
+            drawConnectionToggle = false;
+            showConnectionInfo(false);
+        }
+    }
     else modeModifyTrafficMode = false;
 }
 
