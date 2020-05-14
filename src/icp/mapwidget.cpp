@@ -712,6 +712,7 @@ void MapWidget::wheelEvent(QWheelEvent *event)
         //zoom out
         if(zoomLevel > 1) {
             zoomLevel--;
+
         }
         else return;
     }

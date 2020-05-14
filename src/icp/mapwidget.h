@@ -88,6 +88,13 @@ signals:
     void showModifyTrafficOptions(bool);
     void showOpenAllOption(bool);
 
+    //map zoom/pan symbols signals
+    void adjustMapZoom(int);
+    void allowMapMoveRight(bool);
+    void allowMapMoveLeft(bool);
+    void allowMapMoveUp(bool);
+    void allowMapMoveDown(bool);
+
 public slots:
     void onToggleStreetId(bool);
     void onToggleStreetNames(bool);
@@ -103,6 +110,13 @@ public slots:
     void onTimeSliderChange(int);
     void onResetButtonPress();
     void onModifyClosedFinish();
+
+    //map zoom/pan slots
+    void onMapZoomChange(int);
+    void onMapMoveRight();
+    void onMapMoveLeft();
+    void onMapMoveUp();
+    void onMapMoveDown();
 };
 
 #endif // MAPWIDGET_H

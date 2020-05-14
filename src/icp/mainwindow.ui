@@ -566,7 +566,7 @@
          <x>0</x>
          <y>0</y>
          <width>111</width>
-         <height>141</height>
+         <height>111</height>
         </rect>
        </property>
        <property name="frameShape">
@@ -585,14 +585,14 @@
          </rect>
         </property>
         <property name="text">
-         <string>^</string>
+         <string>▲</string>
         </property>
        </widget>
        <widget class="QSlider" name="mapZoom">
         <property name="geometry">
          <rect>
-          <x>0</x>
-          <y>20</y>
+          <x>10</x>
+          <y>10</y>
           <width>20</width>
           <height>91</height>
          </rect>
@@ -617,39 +617,39 @@
         <property name="geometry">
          <rect>
           <x>30</x>
-          <y>50</y>
+          <y>40</y>
           <width>31</width>
           <height>31</height>
          </rect>
         </property>
         <property name="text">
-         <string>&lt;</string>
+         <string>◄</string>
         </property>
        </widget>
        <widget class="QPushButton" name="mapRight">
         <property name="geometry">
          <rect>
           <x>70</x>
-          <y>50</y>
+          <y>40</y>
           <width>31</width>
           <height>31</height>
          </rect>
         </property>
         <property name="text">
-         <string>&gt;</string>
+         <string>►</string>
         </property>
        </widget>
        <widget class="QPushButton" name="mapDown">
         <property name="geometry">
          <rect>
           <x>50</x>
-          <y>90</y>
+          <y>70</y>
           <width>31</width>
           <height>31</height>
          </rect>
         </property>
         <property name="text">
-         <string>v</string>
+         <string>▼</string>
         </property>
        </widget>
       </widget>
@@ -737,6 +737,11 @@
     <signal>showFinishButton()</signal>
     <signal>showModifyTrafficOptions(bool)</signal>
     <signal>showOpenAllOption(bool)</signal>
+    <signal>adjustMapZoom(int)</signal>
+    <signal>allowMapMoveRight(bool)</signal>
+    <signal>allowMapMoveLeft(bool)</signal>
+    <signal>allowMapMoveUp(bool)</signal>
+    <signal>allowMapMoveDown(bool)</signal>
     <slot>onToggleStreetNames(bool)</slot>
     <slot>onToggleStreetNothing(bool)</slot>
     <slot>onToggleStreetId(bool)</slot>
@@ -751,6 +756,11 @@
     <slot>onResetButtonPress()</slot>
     <slot>onResetAllButtonPress()</slot>
     <slot>onModifyClosedFinish()</slot>
+    <slot>onMapZoomChange(int)</slot>
+    <slot>onMapMoveRight()</slot>
+    <slot>onMapMoveLeft()</slot>
+    <slot>onMapMoveUp()</slot>
+    <slot>onMapMoveDown()</slot>
    </slots>
   </customwidget>
  </customwidgets>
@@ -831,8 +841,8 @@
      <y>236</y>
     </hint>
     <hint type="destinationlabel">
-     <x>542</x>
-     <y>154</y>
+     <x>540</x>
+     <y>152</y>
     </hint>
    </hints>
   </connection>
@@ -1025,6 +1035,150 @@
     <hint type="destinationlabel">
      <x>70</x>
      <y>524</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mapZoom</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>Map</receiver>
+   <slot>onMapZoomChange(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>288</x>
+     <y>94</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>584</x>
+     <y>104</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>Map</sender>
+   <signal>adjustMapZoom(int)</signal>
+   <receiver>mapZoom</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>608</x>
+     <y>60</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>284</x>
+     <y>88</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mapLeft</sender>
+   <signal>clicked()</signal>
+   <receiver>Map</receiver>
+   <slot>onMapMoveLeft()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>322</x>
+     <y>100</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>606</x>
+     <y>80</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>Map</sender>
+   <signal>allowMapMoveLeft(bool)</signal>
+   <receiver>mapLeft</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>634</x>
+     <y>58</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>312</x>
+     <y>116</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mapRight</sender>
+   <signal>clicked()</signal>
+   <receiver>Map</receiver>
+   <slot>onMapMoveRight()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>360</x>
+     <y>98</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>630</x>
+     <y>78</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mapDown</sender>
+   <signal>clicked()</signal>
+   <receiver>Map</receiver>
+   <slot>onMapMoveDown()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>342</x>
+     <y>162</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>668</x>
+     <y>140</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mapUp</sender>
+   <signal>clicked()</signal>
+   <receiver>Map</receiver>
+   <slot>onMapMoveUp()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>342</x>
+     <y>80</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>668</x>
+     <y>98</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>Map</sender>
+   <signal>allowMapMoveUp(bool)</signal>
+   <receiver>mapUp</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>488</x>
+     <y>60</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>332</x>
+     <y>80</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>Map</sender>
+   <signal>allowMapMoveDown(bool)</signal>
+   <receiver>mapDown</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>518</x>
+     <y>66</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>336</x>
+     <y>152</y>
     </hint>
    </hints>
   </connection>
