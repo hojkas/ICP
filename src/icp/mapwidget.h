@@ -68,9 +68,12 @@ private:
 
     //zoom/pan
     int zoomLevel;
-    int xPan;
-    int yPan;
+    float xPan;
+    float yPan;
     void setMapPanButtons();
+    bool mouseDrag;
+    int dragX;
+    int dragY;
 public:
     explicit MapWidget(QWidget *parent = nullptr);
     ~MapWidget();
@@ -82,6 +85,8 @@ protected:
     virtual void resizeEvent(QResizeEvent *event) override;
     virtual void mousePressEvent(QMouseEvent *event) override;
     virtual void wheelEvent(QWheelEvent *event);
+    virtual void mouseReleaseEvent(QMouseEvent *event) override;
+    virtual void mouseMoveEvent(QMouseEvent *event) override;
 
 signals:
     void TimerMessage(QString);
@@ -105,7 +110,15 @@ signals:
     void allowMapMoveUp(bool);
     void allowMapMoveDown(bool);
 
+    //quickguide selection
+    void show1(bool);
+    void show0(bool);
+    void show2(bool);
+    void show3(bool);
+    void show4(bool);
+
 public slots:
+    void onQuickguideSelection(int);
     void onToggleStreetId(bool);
     void onToggleStreetNames(bool);
     void onToggleStreetTime(bool);
@@ -119,6 +132,7 @@ public slots:
 
     void onTimeSliderChange(int);
     void onResetButtonPress();
+    void onResetAllButtonPress();
     void onModifyClosedFinish();
 
     //map zoom/pan slots

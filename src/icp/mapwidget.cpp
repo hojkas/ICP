@@ -34,6 +34,7 @@ MapWidget::MapWidget(QWidget *parent) : QWidget(parent)
     zoomLevel = 1;
     xPan = 0;
     yPan = 0;
+    mouseDrag = false;
 
     conHandler = new connectionHandler;
     conHandler->loadConnections(streets->street_list);
@@ -53,6 +54,20 @@ MapWidget::~MapWidget()
     delete conHandler;
     //delete internalClock;
     //delete updateClock;
+}
+
+void MapWidget::onQuickguideSelection(int val)
+{
+    if(val == 0) emit show0(true);
+    else emit show0(false);
+    if(val == 1) emit show1(true);
+    else emit show1(false);
+    if(val == 2) emit show2(true);
+    else emit show2(false);
+    if(val == 3) emit show3(true);
+    else emit show3(false);
+    if(val == 4) emit show4(true);
+    else emit show4(false);
 }
 
 void MapWidget::onResetButtonPress()
@@ -242,6 +257,19 @@ void MapWidget::onModifyClosedFinish()
     detourStreets.clear();
     emit hideFinishButton();
     emit showOpenAllOption(true);
+    update();
+}
+
+void MapWidget::onResetAllButtonPress()
+{
+    streets->closed_streets.clear();
+    chosingDetourStreets = false;
+    closedStreet = nullptr;
+    detourStreets.clear();
+    emit hideFinishButton();
+
+    //TODO Denis dump objizdkove trasy
+
     update();
 }
 
@@ -827,6 +855,17 @@ void MapWidget::resizeEvent(QResizeEvent *event)
  */
 void MapWidget::mousePressEvent(QMouseEvent *event)
 {
+    if(event->button() == Qt::RightButton)
+    {
+        //right mouse button indicates start of dragging to move map, preparing variables
+        mouseDrag = true;
+        dragX = event->x();
+        dragY = event->y();
+        setCursor(Qt::ClosedHandCursor);
+        event->accept();
+        return;
+    }
+
     //gets relative position to window coordinates 0-100
     int relX = (event->pos().x() * (100 - (zoomLevel-1)*25)) / width() + xPan;
     int relY = (event->pos().y() * (100 - (zoomLevel-1)*25)) / height() + yPan;
@@ -1017,4 +1056,47 @@ void MapWidget::wheelEvent(QWheelEvent *event)
     }
     setMapPanButtons();
     update();
+}
+
+/* @brief Function to handle tiding variables after finished map drag.
+ */
+void MapWidget::mouseReleaseEvent(QMouseEvent *event)
+{
+    if(event->button() == Qt::RightButton) {
+        mouseDrag = false;
+        setCursor(Qt::ArrowCursor);
+        event->accept();
+        setMapPanButtons();
+        return;
+    }
+}
+
+/* @brief Function to handle mouse drag as moving map.
+ */
+void MapWidget::mouseMoveEvent(QMouseEvent *event)
+{
+    if(mouseDrag) {
+        int viewWidth = 100 - (zoomLevel - 1) * 25;
+        int smooth = 1;
+        if(zoomLevel == 2) smooth = 3;
+        else if(zoomLevel == 3) smooth = 6;
+        else if(zoomLevel == 4) smooth = 9;
+        float newX = xPan + (dragX - event->x())/smooth;
+        float newY = yPan + (dragY - event->y())/smooth;
+
+        //checks if newX/Y wound't cause view to go outside the map
+        if(newX + viewWidth > 100) newX = 100 - viewWidth;
+        if(newY + viewWidth > 100) newY = 100 - viewWidth;
+        if(newX < 0) newX = 0;
+        if(newY < 0) newY = 0;
+
+        xPan = newX;
+        yPan = newY;
+
+        dragX = event->x();
+        dragY = event->y();
+        event->accept();
+        update();
+        return;
+    }
 }
