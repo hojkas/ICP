@@ -117,6 +117,13 @@ void MapWidget::onToggleColorTraffic(bool val)
 
 void MapWidget::onToggleModifyClosed(bool val)
 {
+    //clearing display connection info
+    if(drawConnectionToggle) {
+        drawConnection = nullptr;
+        drawConnectionToggle = false;
+        showConnectionInfo(false);
+    }
+
     if(val) modeModifyClosed = true;
     else modeModifyClosed = false;
     //setting or resetting modifyClosed variables
@@ -137,6 +144,13 @@ void MapWidget::onToggleModifyClosed(bool val)
 
 void MapWidget::onToggleModifyTraffic(bool val)
 {
+    //clearing display connection info
+    if(drawConnectionToggle) {
+        drawConnection = nullptr;
+        drawConnectionToggle = false;
+        showConnectionInfo(false);
+    }
+
     if(val) {
         modeModifyTraffic = true;
         if(drawConnectionToggle) {
@@ -227,6 +241,15 @@ void MapWidget::onModifyClosedFinish()
         }
     }
 
+    //check if closed street isn't beggining or end of some connection
+    for(connectionElem con: conHandler->conList) {
+        if(std::get<0>(con.streetList.front()) == closedStreet || std::get<0>(con.streetList.back()) == closedStreet) {
+            emit ErrorMessage("Can't close street that is the end stop of some connection.");
+            allOK = false;
+            break;
+        }
+    }
+
     if(allOK && (startX != endX || startY != endY)) {
         emit ErrorMessage("Detour isn't connected to closed street.");
         allOK = false;
@@ -259,6 +282,21 @@ void MapWidget::onModifyClosedFinish()
 
 void MapWidget::onResetAllButtonPress()
 {
+    //check if no bus is currently taking detour route
+    for(busElem *bus: conHandler->busList) {
+        bool onClassicRounte = false;
+        for(std::tuple<Street*, bool, bool> streetInfo: bus->con->streetList) {
+            if(std::get<0>(streetInfo) == bus->curStreet) {
+                onClassicRounte = true;
+                break;
+            }
+        }
+        if(!onClassicRounte) {
+            emit ErrorMessage("Can't clear closed streets if some bus is riding on detour street. Nothing cleared.");
+            return;
+        }
+    }
+
     streets->closed_streets.clear();
     chosingDetourStreets = false;
     closedStreet = nullptr;
@@ -470,7 +508,14 @@ void MapWidget::collectConnectionInfo(connectionElem *con)
     time = 0;
     first_stop = true;
     extra = 0; //for leaving half of street with stop in case it was the last one
-    for(std::tuple<Street*, bool, bool> street : con->streetList) { //TODO not streetList but detour list
+
+    //if there is closure, it will count timetable from alternate street list (aka list of street including detour)
+    //if there is none, it will do so from standart street list
+    std::list<std::tuple<Street*,bool, bool>> curConList;
+    if(con->closure) curConList = con->alternateStreets;
+    else curConList = con->streetList;
+
+    for(std::tuple<Street*, bool, bool> street : curConList) {
         Street* s = std::get<0>(street);
         bool stop = std::get<2>(street);
         if(stop) {
@@ -504,7 +549,6 @@ void MapWidget::collectConnectionInfo(connectionElem *con)
         }
     }
     emit conCurTT(msg);
-    //TODO add detour timetable ^^
 
     showConnectionInfo(true);
 }
@@ -736,52 +780,56 @@ void MapWidget::paintConnection(QPainter *p)
     p->setPen(con_pen);
 
     //TODO add closed streets option
-    if(true) {
-        //if there are no closed streets on the connection
-        int conLen = drawConnection->streetList.size();
-        int i = 0;
-        for(std::tuple<Street*, bool, bool> streetTouple : drawConnection->streetList) {
-            Street* s = std::get<0>(streetTouple);
-            bool stop = std::get<2>(streetTouple);
-            int x = (s->x1 + s->x2)/2;
-            int y = (s->y1 + s->y2)/2;
+    int conLen;
+    std::list<std::tuple<Street*, bool, bool>> listToDraw;
 
-            if(i == 0) {
-                //first street, to draw just a half
-                bool direction = std::get<1>(streetTouple);
-                if(direction) p->drawLine(x, y, s->x2, s->y2);
-                else p->drawLine(x, y, s->x1, s->y1);
-            }
-            else if(i+1 == conLen) {
-                //last street, to draw just half
-                bool direction = std::get<1>(streetTouple);
-                if(direction) p->drawLine(x, y, s->x1, s->y1);
-                else p->drawLine(x, y, s->x2, s->y2);
-            }
-            else {
-                //draw full street
-                p->drawLine(s->x1, s->y1, s->x2, s->y2);
-            }
-
-            //drawing stop if there is one
-            if(stop) {
-                QPen backup = p->pen();
-                p->setPen(Qt::NoPen);
-                p->setBrush(selectedConnectionColor);
-                if(zoomLevel == 1) p->drawRect(x-2, y-2, 4, 4);
-                else if(zoomLevel == 2) p->drawRect(QRectF(x-1.7, y-1.7, 3.4, 3.4));
-                else if(zoomLevel == 3) p->drawRect(QRectF(x-1.3, y-1.3, 2.6, 2.6));
-                else p->drawRect(x-1, y-1, 2, 2);
-                p->setPen(backup);
-            }
-
-            i++;
-        }
+    if(!drawConnection->closure) {
+        conLen = drawConnection->streetList.size();
+        listToDraw = drawConnection->streetList;
     }
     else {
-        //for closed streets on route
+        conLen = drawConnection->alternateStreets.size();
+        listToDraw = drawConnection->alternateStreets;
     }
 
+    int i = 0;
+    for(std::tuple<Street*, bool, bool> streetTouple : listToDraw) {
+        Street* s = std::get<0>(streetTouple);
+        bool stop = std::get<2>(streetTouple);
+        int x = (s->x1 + s->x2)/2;
+        int y = (s->y1 + s->y2)/2;
+
+        if(i == 0) {
+            //first street, to draw just a half
+            bool direction = std::get<1>(streetTouple);
+            if(direction) p->drawLine(x, y, s->x2, s->y2);
+            else p->drawLine(x, y, s->x1, s->y1);
+        }
+        else if(i+1 == conLen) {
+            //last street, to draw just half
+            bool direction = std::get<1>(streetTouple);
+            if(direction) p->drawLine(x, y, s->x1, s->y1);
+            else p->drawLine(x, y, s->x2, s->y2);
+        }
+        else {
+            //draw full street
+            p->drawLine(s->x1, s->y1, s->x2, s->y2);
+        }
+
+        //drawing stop if there is one
+        if(stop) {
+            QPen backup = p->pen();
+            p->setPen(Qt::NoPen);
+            p->setBrush(selectedConnectionColor);
+            if(zoomLevel == 1) p->drawRect(x-2, y-2, 4, 4);
+            else if(zoomLevel == 2) p->drawRect(QRectF(x-1.7, y-1.7, 3.4, 3.4));
+            else if(zoomLevel == 3) p->drawRect(QRectF(x-1.3, y-1.3, 2.6, 2.6));
+            else p->drawRect(x-1, y-1, 2, 2);
+            p->setPen(backup);
+        }
+
+        i++;
+    }
 }
 
 void MapWidget::paintCloseModeInfo(QPainter *p)
@@ -1081,8 +1129,8 @@ void MapWidget::mouseMoveEvent(QMouseEvent *event)
         if(zoomLevel == 2) smooth = 3;
         else if(zoomLevel == 3) smooth = 6;
         else if(zoomLevel == 4) smooth = 9;
-        float newX = xPan + (dragX - event->x())/smooth;
-        float newY = yPan + (dragY - event->y())/smooth;
+        int newX = xPan + ceil((dragX - event->x())/smooth);
+        int newY = yPan + ceil((dragY - event->y())/smooth);
 
         //checks if newX/Y wound't cause view to go outside the map
         if(newX + viewWidth > 100) newX = 100 - viewWidth;

@@ -16,6 +16,7 @@
 #include <QTimer>
 #include <QMouseEvent>
 #include <QtGlobal>
+#include "math.h"
 
 
 #include "street.h"
@@ -68,8 +69,8 @@ private:
 
     //zoom/pan
     int zoomLevel;
-    float xPan;
-    float yPan;
+    int xPan;
+    int yPan;
     void setMapPanButtons();
     bool mouseDrag;
     int dragX;
