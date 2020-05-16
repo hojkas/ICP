@@ -1,8 +1,9 @@
 /**
  * @file mapwidget.h
- * @author xstrna14
- * @brief TODO
- * Additional description TODO
+ * @author xstrna14, xlebod00
+ * @brief Class to handle all communication with Map widget and its display.
+ * Class emits signals to UI to hide/display information, overrides paint and mouse events
+ * and accepts many signals from UI and reacts to them.
  */
 
 #ifndef MAPWIDGET_H
@@ -82,6 +83,7 @@ public:
     connectionHandler* conHandler;
 
 protected:
+    //Overrides of mouse or paint events.
     virtual void paintEvent(QPaintEvent *event) override;
     virtual void resizeEvent(QResizeEvent *event) override;
     virtual void mousePressEvent(QMouseEvent *event) override;
@@ -90,35 +92,37 @@ protected:
     virtual void mouseMoveEvent(QMouseEvent *event) override;
 
 signals:
-    void TimerMessage(QString);
-    void ErrorMessage(QString);
-    void hideFinishButton();
-    void showFinishButton();
-    void showModifyTrafficOptions(bool);
-    void showOpenAllOption(bool);
+    //All signals are used to signal UI what to display/hide.
+    void TimerMessage(QString);             /**< Sends QString text to display for simulation time. */
+    void ErrorMessage(QString);             /**< Sends QString text to display "Event Log" */
+    void hideFinishButton();                /**< Hides Finish Closure button. */
+    void showFinishButton();                /**< Shows Finish Closure button. */
+    void showModifyTrafficOptions(bool);    /**< If bool is true, shows options for Traffic editor, hides them if false. */
+    void showOpenAllOption(bool);           /**< If bool is true, shows button to open all closures, hides it otherwise. */
 
-    void showConnectionInfo(bool);
-    void conName(QString);
-    void conGenTime(QString);
-    void conGenTT(QString);
-    void conCurTT(QString);
-    void conBuses(QString);
+    void showConnectionInfo(bool);          /**< If bool is true, shows panel with information about clicked connection, hides if false. */
+    void conName(QString);                  /**< Sends QString into connection name display. */
+    void conGenTime(QString);               /**< Sends QString into connection generated time display. */
+    void conGenTT(QString);                 /**< Sends QString into connection General Timetable display. */
+    void conCurTT(QString);                 /**< Sends QString into connection Current Timetable display. */
+    void conBuses(QString);                 /**< Sends QString into connection Buses Departure display. */
 
     //map zoom/pan symbols signals
-    void adjustMapZoom(int);
-    void allowMapMoveRight(bool);
-    void allowMapMoveLeft(bool);
-    void allowMapMoveUp(bool);
-    void allowMapMoveDown(bool);
+    void adjustMapZoom(int);                /**< Sends new value to map zoom slider.*/
+    void allowMapMoveRight(bool);           /**< Bool decides whether move move right button is clickable or not.*/
+    void allowMapMoveLeft(bool);            /**< Bool decides whether move move left button is clickable or not.*/
+    void allowMapMoveUp(bool);              /**< Bool decides whether move move up button is clickable or not.*/
+    void allowMapMoveDown(bool);            /**< Bool decides whether move move down button is clickable or not.*/
 
     //quickguide selection
-    void show1(bool);
-    void show0(bool);
-    void show2(bool);
-    void show3(bool);
-    void show4(bool);
+    void show1(bool);                       /**< If true, shows panel #1 in quickguide. Hides it if false.*/
+    void show0(bool);                       /**< If true, shows panel 0 in quickguide. Hides it if false.*/
+    void show2(bool);                       /**< If true, shows panel #2 in quickguide. Hides it if false.*/
+    void show3(bool);                       /**< If true, shows panel #3 in quickguide. Hides it if false.*/
+    void show4(bool);                       /**< If true, shows panel #4 in quickguide. Hides it if false.*/
 
 public slots:
+    //All slots accept signals from UI and decide how the map and its displayed contents are affected by them.
     void onQuickguideSelection(int);
     void onToggleStreetId(bool);
     void onToggleStreetNames(bool);
