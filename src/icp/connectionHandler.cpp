@@ -67,13 +67,15 @@ void connectionHandler::loadConnections(std::list<Street*> streetList)
 
             bool onMap = false;
             connectionElem *con =  &conList.back();
+            bool returning = busArray[a].toObject()["return"].toBool();
             int departure = busArray[a].toObject()["time"].toInt();
             int timeOnStreet = 0;
-            Street* currStrt = std::get<0>(con->streetList.front());
-            int x = (currStrt->x1 + currStrt->x2) / 2;
-            int y = (currStrt->y1 + currStrt->y2) / 2;
-            bool returning = false;
-            busElem* bus = new busElem(onMap, con, departure, timeOnStreet, x, y, currStrt, returning);
+            Street *currStreet;
+            if (returning) currStreet = std::get<0>(con->streetList.back());
+            else currStreet = std::get<0>(con->streetList.front());
+            int x = (currStreet->x1 + currStreet->x2) / 2;
+            int y = (currStreet->y1 + currStreet->y2) / 2;
+            busElem* bus = new busElem(onMap, con, departure, timeOnStreet, x, y, currStreet, returning);
             busList.push_back(bus);
         }
     }
@@ -123,7 +125,8 @@ tupleElem connectionHandler::findStreet(Street* currStreet, tupleList streetList
 void connectionHandler::resetBus(busElem* bus)
 {
     bus->onMap = false;
-    bus->curStreet = std::get<0>(bus->con->streetList.front());
+    if(bus->returning) std::get<0>(bus->con->streetList.back());
+    else bus->curStreet = std::get<0>(bus->con->streetList.front());
     bus->x = bus->curStreet->x1;
     bus->y = bus->curStreet->y1;
     bus->streetIndex = 0;
@@ -137,6 +140,7 @@ void connectionHandler::busUpdate(){
     temp.setHMS(0,0,0,0);
     timePassed = temp.secsTo(currentTime);
     for(busElem *bus: busList){
+
         bool justEntered = false;
         if(!bus->onMap){
             if(bus->departure < timePassed && (timePassed - bus->departure) <= secondsPerTick){
@@ -146,31 +150,27 @@ void connectionHandler::busUpdate(){
             }
         }
         if(bus->onMap){
+            tupleList streetList = bus->con->streetList;
+            if(bus->con->closure) streetList = bus->con->alternateStreets;
+            if(bus->returning) streetList.reverse();
+
             if(!justEntered) bus->timeOnStreet += secondsPerTick;
-            if(bus->curStreet == std::get<0>(bus->con->streetList.back()) && \
+            if(bus->curStreet == std::get<0>(streetList.back()) && \
                (bus->timeOnStreet >= bus->curStreet->count_time() / 2)){
                 this->resetBus(bus);
                 continue;
             }
             else if(bus->timeOnStreet >= bus->curStreet->count_time()){
                 bus->timeOnStreet -= bus->curStreet->count_time();
-                if(bus->con->closure){
-                    bus->curStreet = std::get<0>(this->findStreet(bus->curStreet, bus->con->alternateStreets, bus->streetIndex, true));
-                }
-                else{
-                    bus->curStreet = std::get<0>(this->findStreet(bus->curStreet, bus->con->streetList, bus->streetIndex, true));
-                }
+                bus->curStreet = std::get<0>(this->findStreet(bus->curStreet, streetList, bus->streetIndex, true));
                 bus->streetIndex++;
             }
             tupleElem streetTuple;
-            if(bus->con->closure){
-                streetTuple = this->findStreet(bus->curStreet,bus->con->alternateStreets,bus->streetIndex,false);
-            }
-            else{
-                streetTuple = this->findStreet(bus->curStreet,bus->con->streetList,bus->streetIndex,false);
-            }
+            streetTuple = this->findStreet(bus->curStreet,streetList ,bus->streetIndex,false);
             float streetTime = bus->curStreet->count_time();
-            if(std::get<1>(streetTuple)){
+            bool direction = std::get<1>(streetTuple);
+            if(bus->returning) direction = !direction;
+            if(direction){
                 bus->x = (bus->curStreet->x1 + (bus->timeOnStreet/streetTime) * \
                         (bus->curStreet->x2 - bus->curStreet->x1));
                 bus->y = bus->curStreet->y1 + (bus->timeOnStreet/streetTime) * \
@@ -191,13 +191,9 @@ void connectionHandler::createClosure(Street* closed, std::list<Street*> alterna
 {
     for(auto i = begin(conList); i != end(conList); i++){
         connectionElem* conPtr = &(*i);
-        tupleList streetList;
-        if(conPtr->closure){
-            streetList = conPtr->alternateStreets;
-        }
-        else{
-            streetList = conPtr->streetList;
-        }
+        tupleList streetList = conPtr->streetList;
+        if(conPtr->closure) streetList = conPtr->alternateStreets;
+
         for(auto streetTuple : streetList){
             Street *street = std::get<0>(streetTuple);
             if(street == closed){
