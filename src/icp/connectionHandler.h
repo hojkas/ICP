@@ -32,6 +32,7 @@ public:
     float x;
     float y;
     Street* curStreet;
+    int streetIndex;
     bool returning;
     busElem(bool map, connectionElem *connnection, int dep, int tOS, int X, int Y, Street *strt, bool r);
 };

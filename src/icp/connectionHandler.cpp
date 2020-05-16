@@ -116,9 +116,12 @@ void connectionHandler::resetBus(busElem* bus)
     if(bus->con->closure){
         bus->curStreet = std::get<0>(bus->con->alternateStreets.front());
     }
-    bus->curStreet = std::get<0>(bus->con->streetList.front());
+    else{
+        bus->curStreet = std::get<0>(bus->con->streetList.front());
+    }
     bus->x = bus->curStreet->x1;
     bus->y = bus->curStreet->y1;
+    bus->streetIndex = 0;
     bus->timeOnStreet = 0;
 }
 
