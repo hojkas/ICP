@@ -10,11 +10,16 @@
 #include <time.h>
 #include "street.h"
 
+using tupleElem = std::tuple<Street*, bool, bool>;
+using tupleList = std::list<tupleElem>;
+
 class connectionElem
 {
 public:
     QString name;
-    std::list<std::tuple<Street*, bool, bool>> streetList;
+    tupleList streetList;
+    bool closure;
+    tupleList alternateStreets;
 };
 
 class busElem
@@ -36,13 +41,18 @@ class connectionHandler : public QObject
     Q_OBJECT
 public:
     explicit connectionHandler(QObject *parent = nullptr);
+    ~connectionHandler();
     QTime currentTime;
     std::list<connectionElem> conList;
     std::list<busElem*> busList;
     void loadConnections(std::list<Street *> street_list);
     void resetBus(busElem* bus);
-    std::tuple<Street*, bool, bool> findStreet(Street* currStreet, std::list<std::tuple<Street*, bool, bool>> streetList, bool next);
-    ~connectionHandler();
+    auto createAltRoute(std::list<Street*> altStreets, connectionElem *connection, Street* closed);
+    tupleElem findStreet(Street* currStreet, tupleList streetList, bool next);
+    void createClosure(Street* closed, std::list<Street*> alternativeStreets);
+    tupleList updateClosure(Street* closed, std::list<Street*> alternateStreets, tupleList streetList);
+    tupleList shortenPath(tupleList streetList);
+
 signals:
     void busUpdated();
 public slots:

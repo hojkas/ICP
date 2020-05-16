@@ -45,6 +45,7 @@ void connectionHandler::loadConnections(std::list<Street*> streetList)
         connectionElem con;
         QJsonObject obj = jArray[i].toObject();
         con.name = obj["name"].toString();
+        con.closure = false;
         QJsonArray streetArray = obj["streets"].toArray();
         for(int a = 0; a < streetArray.size(); a++){
             int streetID = streetArray[a].toObject()["id"].toInt();
@@ -56,7 +57,7 @@ void connectionHandler::loadConnections(std::list<Street*> streetList)
                     streetPtr = street;
                 }
             }
-            std::tuple<Street*,bool,bool> street(streetPtr,direction,stop);
+            tupleElem street(streetPtr,direction,stop);
             con.streetList.push_back(street);
         }
         conList.push_back(con);
@@ -80,7 +81,8 @@ void connectionHandler::loadConnections(std::list<Street*> streetList)
 void connectionHandler::printConnections()
 {
     for(connectionElem con : conList){
-        for(std::tuple<Street*,bool,bool> street : con.streetList){
+        qDebug() << con.closure;
+        for(tupleElem street : con.alternateStreets){
             qDebug() << std::get<0>(street)->id;
         }
         qDebug() << "-----------------";
@@ -95,10 +97,10 @@ void connectionHandler::printBuses()
     }
 }
 
-std::tuple<Street*, bool, bool> connectionHandler::findStreet(Street* currStreet, std::list<std::tuple<Street*, bool, bool>> streetList, bool next)
+tupleElem connectionHandler::findStreet(Street* currStreet, tupleList streetList, bool next)
 {
     bool found = false;
-    for(std::tuple<Street*, bool, bool> streetTuple : streetList){
+    for(tupleElem streetTuple : streetList){
         Street * street = std::get<0>(streetTuple);
         if(found) return streetTuple;
         if(currStreet == street) {
@@ -111,9 +113,12 @@ std::tuple<Street*, bool, bool> connectionHandler::findStreet(Street* currStreet
 void connectionHandler::resetBus(busElem* bus)
 {
     bus->onMap = false;
+    if(bus->con->closure){
+        bus->curStreet = std::get<0>(bus->con->alternateStreets.front());
+    }
     bus->curStreet = std::get<0>(bus->con->streetList.front());
-    int x = bus->curStreet->x1;
-    int y = bus->curStreet->y1;
+    bus->x = bus->curStreet->x1;
+    bus->y = bus->curStreet->y1;
     bus->timeOnStreet = 0;
 }
 
@@ -141,9 +146,20 @@ void connectionHandler::busUpdate(){
             }
             else if(bus->timeOnStreet >= bus->curStreet->count_time()){
                 bus->timeOnStreet -= bus->curStreet->count_time();
-                bus->curStreet = std::get<0>(this->findStreet(bus->curStreet, bus->con->streetList, true));
+                if(bus->con->closure){
+                    bus->curStreet = std::get<0>(this->findStreet(bus->curStreet, bus->con->alternateStreets, true));
+                }
+                else{
+                    bus->curStreet = std::get<0>(this->findStreet(bus->curStreet, bus->con->streetList, true));
+                }
             }
-            std::tuple<Street*, bool, bool> streetTuple = this->findStreet(bus->curStreet,bus->con->streetList,false);
+            tupleElem streetTuple;
+            if(bus->con->closure){
+                streetTuple = this->findStreet(bus->curStreet,bus->con->alternateStreets,false);
+            }
+            else{
+                streetTuple = this->findStreet(bus->curStreet,bus->con->streetList,false);
+            }
             float streetTime = bus->curStreet->count_time();
             if(std::get<1>(streetTuple)){
                 bus->x = (bus->curStreet->x1 + (bus->timeOnStreet/streetTime) * \
@@ -160,4 +176,127 @@ void connectionHandler::busUpdate(){
         }
     }
     emit busUpdated();
+}
+
+void connectionHandler::createClosure(Street* closed, std::list<Street*> alternativeStreets)
+{
+    for(auto i = begin(conList); i != end(conList); i++){
+        connectionElem* conPtr = &(*i);
+        tupleList streetList;
+        if(conPtr->closure){
+            streetList = conPtr->alternateStreets;
+        }
+        else{
+            streetList = conPtr->streetList;
+        }
+        for(auto streetTuple : streetList){
+            Street *street = std::get<0>(streetTuple);
+            if(street == closed){
+                if(conPtr->closure){
+                    conPtr->alternateStreets = this->updateClosure(closed, alternativeStreets, conPtr->alternateStreets);
+                    conPtr->alternateStreets = this->shortenPath(conPtr->alternateStreets);
+                }
+                else{
+                    conPtr->closure = true;
+                    conPtr->alternateStreets = this->updateClosure(closed, alternativeStreets, conPtr->streetList);
+                    conPtr->alternateStreets = this->shortenPath(conPtr->alternateStreets);
+                }
+            }
+
+        }
+    }
+}
+
+tupleList connectionHandler::shortenPath(tupleList streetList)
+{
+    // Create return list of the alternate Route
+    tupleList returnList;
+    bool duplicateFound = false;
+    Street *prevStreet;
+    for(tupleElem streetTuple : streetList){
+        Street* currentStreet = std::get<0>(streetTuple);
+        bool isStop = std::get<2> (streetTuple);
+        if(streetTuple == streetList.front()){
+            prevStreet = currentStreet;
+            returnList.push_back(streetTuple);
+            continue;
+        }
+
+        if(currentStreet == prevStreet && !isStop){
+            duplicateFound = true;
+            returnList.pop_back();
+        }
+
+        else{
+            returnList.push_back(streetTuple);
+        }
+    }
+    if(duplicateFound){
+        returnList = this->shortenPath(returnList);
+    }
+    return returnList;
+}
+
+tupleList connectionHandler::updateClosure(Street* closed, std::list<Street*> alternateStreets, tupleList streetList)
+{
+    // Create return list of the alternate Route
+    tupleList alternateList;
+   // Go through every street
+    for(tupleElem streetTuple : streetList){
+        // Obtain the street pointer and the direction
+        Street *street = std::get<0>(streetTuple);
+        bool direction = std::get<1>(streetTuple);
+        // If the street is closed, do not push to the new list
+        if(street == closed){
+            // Determining the direction of first element is oposite to the rest
+            Street* altStreet = alternateStreets.front();
+            // If switching directions from true -> false
+            if(direction){
+                if(street->x1 == altStreet->x2 && street->y1 == altStreet->y2){
+                    direction = false;
+                }
+            }
+            // If switching directions from false -> true
+            else{
+                if(street->x2 == altStreet->x1 && street->y2 == altStreet->y1){
+                    direction = true;
+                }
+            }
+            // Add the first street to the list
+            tupleElem temp(altStreet, direction, false);
+            alternateList.push_back(temp);
+            // In the for loop Street* street represents the previous street and direction
+            // represents the direction of the previous street
+            street = alternateStreets.front();
+            // Go through the entire list of alternate streets
+            for(Street* altStreet : alternateStreets){
+                // First element was already handled
+                if(altStreet == alternateStreets.front()) continue;
+
+                // If switching direction from true -> false
+                if(direction){
+                    if(street->x2 == altStreet->x2 && street->y2 == altStreet->y2){
+                       direction = false;
+                    }
+                }
+                // If switching direction from false -> true
+                else{
+                    if(street->x1 = altStreet->x1 && street->y1 == altStreet->y1){
+                        direction = true;
+                    }
+                }
+                tupleElem temp(altStreet, direction, false);
+                // Add to the list
+                alternateList.push_back(temp);
+                // Set previous street
+                street = altStreet;
+            }
+
+        }
+        // if the street is not closed, push to the list
+        else{
+            alternateList.push_back(streetTuple);
+        }
+    }
+    return alternateList;
 }
