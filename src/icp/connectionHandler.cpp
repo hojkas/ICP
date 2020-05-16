@@ -11,6 +11,7 @@ busElem::busElem(bool map, connectionElem *connection, int dep, int tOS, int X, 
     y = Y;
     curStreet = strt;
     returning = r;
+    streetIndex = 0;
 }
 
 connectionHandler::connectionHandler(QObject *parent) : QObject(parent)
@@ -97,15 +98,24 @@ void connectionHandler::printBuses()
     }
 }
 
-tupleElem connectionHandler::findStreet(Street* currStreet, tupleList streetList, bool next)
+tupleElem connectionHandler::findStreet(Street* currStreet, tupleList streetList, int streetIndex, bool next)
 {
     bool found = false;
-    for(tupleElem streetTuple : streetList){
-        Street * street = std::get<0>(streetTuple);
-        if(found) return streetTuple;
-        if(currStreet == street) {
-            if(next) found = true;
-            else return streetTuple;
+    auto it = begin(streetList);
+    advance(it, streetIndex);
+    if(std::get<0>(*it) == currStreet){
+        if(next) return *(++it);
+        else return *it;
+    }
+    else{
+        qDebug() << "Not found through itter";
+        for(tupleElem streetTuple : streetList){
+            Street * street = std::get<0>(streetTuple);
+            if(found) return streetTuple;
+            if(currStreet == street) {
+                if(next) found = true;
+                else return streetTuple;
+            }
         }
     }
 }
@@ -113,12 +123,7 @@ tupleElem connectionHandler::findStreet(Street* currStreet, tupleList streetList
 void connectionHandler::resetBus(busElem* bus)
 {
     bus->onMap = false;
-    if(bus->con->closure){
-        bus->curStreet = std::get<0>(bus->con->alternateStreets.front());
-    }
-    else{
-        bus->curStreet = std::get<0>(bus->con->streetList.front());
-    }
+    bus->curStreet = std::get<0>(bus->con->streetList.front());
     bus->x = bus->curStreet->x1;
     bus->y = bus->curStreet->y1;
     bus->streetIndex = 0;
@@ -150,18 +155,19 @@ void connectionHandler::busUpdate(){
             else if(bus->timeOnStreet >= bus->curStreet->count_time()){
                 bus->timeOnStreet -= bus->curStreet->count_time();
                 if(bus->con->closure){
-                    bus->curStreet = std::get<0>(this->findStreet(bus->curStreet, bus->con->alternateStreets, true));
+                    bus->curStreet = std::get<0>(this->findStreet(bus->curStreet, bus->con->alternateStreets, bus->streetIndex, true));
                 }
                 else{
-                    bus->curStreet = std::get<0>(this->findStreet(bus->curStreet, bus->con->streetList, true));
+                    bus->curStreet = std::get<0>(this->findStreet(bus->curStreet, bus->con->streetList, bus->streetIndex, true));
                 }
+                bus->streetIndex++;
             }
             tupleElem streetTuple;
             if(bus->con->closure){
-                streetTuple = this->findStreet(bus->curStreet,bus->con->alternateStreets,false);
+                streetTuple = this->findStreet(bus->curStreet,bus->con->alternateStreets,bus->streetIndex,false);
             }
             else{
-                streetTuple = this->findStreet(bus->curStreet,bus->con->streetList,false);
+                streetTuple = this->findStreet(bus->curStreet,bus->con->streetList,bus->streetIndex,false);
             }
             float streetTime = bus->curStreet->count_time();
             if(std::get<1>(streetTuple)){
@@ -218,33 +224,31 @@ tupleList connectionHandler::shortenPath(tupleList streetList)
 {
     tupleElem prev;
     tupleList newList;
-    bool changed = false;
-    bool first = true;
-    for(std::tuple<Street*,bool,bool> sTuple : streetList) {
+    bool foundDuplicate = false;
+    for(std::tuple<Street*,bool,bool> streetTuple : streetList) {
         //for first item on the lists
-        if(first) {
-            first = false;
-            prev = sTuple;
-            newList.push_back(sTuple);
+        if(streetTuple == streetList.front()) {
+            prev = streetTuple;
+            newList.push_back(streetTuple);
             continue;
         }
 
-        if(std::get<0>(prev) == std::get<0>(sTuple)) {
+        if(std::get<0>(prev) == std::get<0>(streetTuple)) {
             //the same street twice in row
-            if(std::get<1>(prev) != std::get<1>(sTuple) && (!std::get<2>(prev)) && (!std::get<2>(sTuple))) {
-                //direction is different, none of them is a stop
-                changed = true;
+            if(std::get<1>(prev) != std::get<1>(streetTuple) && (!std::get<2>(prev)) && (!std::get<2>(streetTuple))) {
+                //direction is different, neither of them are a stop
+                foundDuplicate = true;
                 //erases last element and doesn't push this one
                 newList.pop_back();
                 continue;
             }
         }
 
-        newList.push_back(sTuple);
-        prev = sTuple;
+        newList.push_back(streetTuple);
+        prev = streetTuple;
     }
 
-    if(changed) return shortenPath(newList);
+    if(foundDuplicate) return shortenPath(newList);
     else return newList;
 }
 

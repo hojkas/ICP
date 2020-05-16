@@ -49,7 +49,7 @@ public:
     void loadConnections(std::list<Street *> street_list);
     void resetBus(busElem* bus);
     auto createAltRoute(std::list<Street*> altStreets, connectionElem *connection, Street* closed);
-    tupleElem findStreet(Street* currStreet, tupleList streetList, bool next);
+    tupleElem findStreet(Street* currStreet, tupleList streetList, int streetIndex, bool next);
     void createClosure(Street* closed, std::list<Street*> alternativeStreets);
     tupleList updateClosure(Street* closed, std::list<Street*> alternateStreets, tupleList streetList);
     tupleList shortenPath(tupleList streetList);
