@@ -250,16 +250,42 @@ tupleList connectionHandler::updateClosure(Street* closed, std::list<Street*> al
         if(street == closed){
             // Determining the direction of first element is oposite to the rest
             Street* altStreet = alternateStreets.front();
-            // If switching directions from true -> false
+
             if(direction){
                 if(street->x1 == altStreet->x2 && street->y1 == altStreet->y2){
                     direction = false;
                 }
+                else if(street->x1 == altStreet->x1 && street->y1 == altStreet->y1){
+                    direction = true;
+                }
+                else{
+                    alternateStreets.reverse();
+                    altStreet = alternateStreets.front();
+                    if(street->x1 == altStreet->x2 && street->y1 == altStreet->y2){
+                        direction = false;
+                    }
+                    else if(street->x1 == altStreet->x1 && street->y1 == altStreet->y1){
+                        direction = true;
+                    }
+                }
             }
-            // If switching directions from false -> true
+
             else{
                 if(street->x2 == altStreet->x1 && street->y2 == altStreet->y1){
                     direction = true;
+                }
+                else if(street->x2 == altStreet->x2 && street->y2 == altStreet->y2){
+                    direction = false;
+                }
+                else{
+                    alternateStreets.reverse();
+                    altStreet = alternateStreets.front();
+                    if(street->x2 == altStreet->x1 && street->y2 == altStreet->y1){
+                        direction = true;
+                    }
+                    else if(street->x2 == altStreet->x2 && street->y2 == altStreet->y2){
+                        direction = false;
+                    }
                 }
             }
             // Add the first street to the list
