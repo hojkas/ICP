@@ -268,7 +268,7 @@ void MapWidget::onModifyClosedFinish()
         streets->addClosedStreet(closedStreet);
         if(allOK) emit ErrorMessage("Detour added. Press another street if you wish to add another closure.");
         conHandler->createClosure(closedStreet, detourStreets);
-        conHandler->printConnections();
+        //conHandler->printConnections();
     }
 
     //reseting state

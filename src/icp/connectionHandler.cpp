@@ -210,7 +210,7 @@ void connectionHandler::createClosure(Street* closed, std::list<Street*> alterna
 tupleList connectionHandler::shortenPath(tupleList streetList)
 {
     // Create return list of the alternate Route
-    tupleList returnList;
+    /*tupleList returnList;
     bool duplicateFound = false;
     Street *prevStreet;
     for(tupleElem streetTuple : streetList){
@@ -234,7 +234,37 @@ tupleList connectionHandler::shortenPath(tupleList streetList)
     if(duplicateFound){
         returnList = this->shortenPath(returnList);
     }
-    return returnList;
+    return returnList;*/
+    tupleElem prev;
+    tupleList newList;
+    bool changed = false;
+    bool first = true;
+    for(std::tuple<Street*,bool,bool> sTuple : streetList) {
+        //for first item on the lists
+        if(first) {
+            first = false;
+            prev = sTuple;
+            newList.push_back(sTuple);
+            continue;
+        }
+
+        if(std::get<0>(prev) == std::get<0>(sTuple)) {
+            //the same street twice in row
+            if(std::get<1>(prev) != std::get<1>(sTuple) && (!std::get<2>(prev)) && (!std::get<2>(sTuple))) {
+                //direction is different, none of them is a stop
+                changed = true;
+                //erases last element and doesn't push this one
+                newList.pop_back();
+                continue;
+            }
+        }
+
+        newList.push_back(sTuple);
+        prev = sTuple;
+    }
+
+    if(changed) return shortenPath(newList);
+    else return newList;
 }
 
 tupleList connectionHandler::updateClosure(Street* closed, std::list<Street*> alternateStreets, tupleList streetList)
