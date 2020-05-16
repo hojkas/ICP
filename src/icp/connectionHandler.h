@@ -10,13 +10,16 @@
 #include <time.h>
 #include "street.h"
 
+using tupleElem = std::tuple<Street*, bool, bool>;
+using tupleList = std::list<tupleElem>;
+
 class connectionElem
 {
 public:
     QString name;
-    std::list<std::tuple<Street*, bool, bool>> streetList;
+    tupleList streetList;
     bool closure;
-    std::list<std::tuple<Street*, bool, bool>> alternateStreets;
+    tupleList alternateStreets;
 };
 
 class busElem
@@ -38,15 +41,17 @@ class connectionHandler : public QObject
     Q_OBJECT
 public:
     explicit connectionHandler(QObject *parent = nullptr);
+    ~connectionHandler();
     QTime currentTime;
     std::list<connectionElem> conList;
     std::list<busElem*> busList;
     void loadConnections(std::list<Street *> street_list);
     void resetBus(busElem* bus);
     auto createAltRoute(std::list<Street*> altStreets, connectionElem *connection, Street* closed);
-    std::tuple<Street*, bool, bool> findStreet(Street* currStreet, std::list<std::tuple<Street*, bool, bool>> streetList, bool next);
+    tupleElem findStreet(Street* currStreet, tupleList streetList, bool next);
     void createClosure(Street* closed, std::list<Street*> alternativeStreets);
-    std::list<std::tuple<Street*, bool, bool>> updateClosure(Street* closed, std::list<Street*> alternateStreets, auto streetList, connectionElem connection);
+    tupleList updateClosure(Street* closed, std::list<Street*> alternateStreets, tupleList streetList);
+    tupleList shortenPath(tupleList streetList);
 
 signals:
     void busUpdated();

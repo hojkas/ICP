@@ -1,6 +1,6 @@
 [
 {
-	"name":"S1",
+	"name":"C1",
 	"streets":
 	[
 		{
@@ -37,7 +37,7 @@
 	]
 },
 {
-    "name":"S2",
+    "name":"C2",
     "streets":
     [
         {
@@ -67,5 +67,47 @@
             "return":false
         }
     ]
+},
+{
+	"name":"C3",
+	"streets":
+	[
+		{
+			"id": 31,
+            "right_direction": true,
+			"stop": true
+		},
+		{
+			"id": 33,
+            "right_direction":true,
+			"stop": false
+		},
+		{
+            "id": 21,
+            "right_direction":false,
+			"stop":false
+		},
+		{
+            "id": 26,
+            "right_direction":false,
+			"stop": true
+		},
+		{
+            "id": 25,
+            "right_direction":false,
+			"stop": true
+		}
+	],
+	"buses":
+	[
+		{
+			"time":0,
+			"return":false
+		},
+		{
+            "time":300,
+			"return":false
+		}
+	]
 }
 ]

@@ -76,8 +76,7 @@ void MapWidget::onResetButtonPress()
     for(busElem* bus : this->conHandler->busList){
         conHandler->resetBus(bus);
     }
-    //TODO Denis
-    //call your function that just cleans all the closures and sets bools about them to false
+
     update();
 }
 
@@ -245,10 +244,8 @@ void MapWidget::onModifyClosedFinish()
     if(allOK){
         streets->addClosedStreet(closedStreet);
         if(allOK) emit ErrorMessage("Detour added. Press another street if you wish to add another closure.");
-        //TODO Denis
-        //conHandler->functionToCreateClosureOnAllRelevantConnections(closedStreet, detourStreets);
-        //closedStreet: Street*
-        //detourStreets: std::list<Street*>
+        conHandler->createClosure(closedStreet, detourStreets);
+        conHandler->printConnections();
     }
 
     //reseting state
@@ -268,8 +265,11 @@ void MapWidget::onResetAllButtonPress()
     detourStreets.clear();
     emit hideFinishButton();
 
-    //TODO Denis dump objizdkove trasy
-
+    for(auto i = begin(conHandler->conList); i != end(conHandler->conList); i++){
+        connectionElem *con = &*i;
+        con->closure = false;
+        con->alternateStreets.clear();
+    }
     update();
 }
 
