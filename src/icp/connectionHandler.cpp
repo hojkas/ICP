@@ -207,34 +207,12 @@ void connectionHandler::createClosure(Street* closed, std::list<Street*> alterna
     }
 }
 
+/* @brief Function goes through streetList, checks if two same streets are next to each other without stop, and removes such (recursively if needed)
+ * @param tupleList List of all streets of connection.
+ * @return tupleList list of connection with removed duplicit streets.
+ */
 tupleList connectionHandler::shortenPath(tupleList streetList)
 {
-    // Create return list of the alternate Route
-    /*tupleList returnList;
-    bool duplicateFound = false;
-    Street *prevStreet;
-    for(tupleElem streetTuple : streetList){
-        Street* currentStreet = std::get<0>(streetTuple);
-        bool isStop = std::get<2> (streetTuple);
-        if(streetTuple == streetList.front()){
-            prevStreet = currentStreet;
-            returnList.push_back(streetTuple);
-            continue;
-        }
-
-        if(currentStreet == prevStreet && !isStop){
-            duplicateFound = true;
-            returnList.pop_back();
-        }
-
-        else{
-            returnList.push_back(streetTuple);
-        }
-    }
-    if(duplicateFound){
-        returnList = this->shortenPath(returnList);
-    }
-    return returnList;*/
     tupleElem prev;
     tupleList newList;
     bool changed = false;
