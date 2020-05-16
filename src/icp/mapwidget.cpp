@@ -564,17 +564,6 @@ void MapWidget::paintEvent(QPaintEvent *event)
     //refreshes time message
     createTimerMessage();
 
-    /* TODO figure out
-    float scl = 1;
-    p.scale(scl,scl);
-    int trans = 0;
-    p.translate(trans, trans);
-    //p.translate(50,50);
-    int off = 40;
-    int start = 0 + off;
-    int end = 100 - off;
-    p.setWindow(50, 50, 100, 100);*/
-
     //Map outline
     p.drawLine(0,0,100,0);
     p.drawLine(0,0,0,100);
@@ -779,7 +768,6 @@ void MapWidget::paintConnection(QPainter *p)
     con_pen.setBrush(selectedConnectionColor);
     p->setPen(con_pen);
 
-    //TODO add closed streets option
     int conLen;
     std::list<std::tuple<Street*, bool, bool>> listToDraw;
 
