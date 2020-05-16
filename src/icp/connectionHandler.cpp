@@ -281,7 +281,7 @@ tupleList connectionHandler::updateClosure(Street* closed, std::list<Street*> al
                 }
                 // If switching direction from false -> true
                 else{
-                    if(street->x1 = altStreet->x1 && street->y1 == altStreet->y1){
+                    if(street->x1 == altStreet->x1 && street->y1 == altStreet->y1){
                         direction = true;
                     }
                 }
