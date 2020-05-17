@@ -11,7 +11,12 @@ BackEnd::BackEnd(QObject *parent) : QObject(parent)
 {
 
 }
-
+/**
+ * @brief Loads and parses a JSON file
+ * @param file JSON file to be parsed
+ * @param jsonDocument variable to store the parsed QJsonDocument
+ * @return Whether the loading was a success
+ */
 bool BackEnd::loadFile(QString file, QJsonDocument* jsonDocument)
 {
     // Otvorit file

@@ -332,7 +332,7 @@ void MapWidget::onResetAllButtonPress()
     //check if no bus is currently taking detour route
     for(busElem *bus: conHandler->busList) {
         bool onClassicRounte = false;
-        for(std::tuple<Street*, bool, bool> streetInfo: bus->con->streetList) {
+        for(std::tuple<Street*, bool, bool> streetInfo: bus->connnecton->streetList) {
             if(std::get<0>(streetInfo) == bus->curStreet) {
                 onClassicRounte = true;
                 break;
@@ -519,7 +519,7 @@ void MapWidget::collectConnectionInfo(connectionElem *con)
     msg = "";
     bool any = false;
     for(busElem* bus : conHandler->busList) {
-        if(bus->con == con) {
+        if(bus->connnecton == con) {
             any = true;
             msg.append(createTimeString(bus->departure));
             if(bus->onMap) {
@@ -820,7 +820,7 @@ void MapWidget::paintBuses(QPainter* p)
     for(busElem* bus : this->conHandler->busList){
         if(drawConnectionToggle && drawConnection != nullptr) {
             //check if bus is on currently drawn connection
-            if(drawConnection->name == bus->con->name) p->setBrush(selectedBusColor);
+            if(drawConnection->name == bus->connnecton->name) p->setBrush(selectedBusColor);
             else p->setBrush(Qt::black);
         }
         else p->setBrush(Qt::black);
@@ -1122,8 +1122,8 @@ void MapWidget::mouseEventNormal(int x, int y)
             QPointF busXY = QPointF(bus->x, bus->y) - mouseXY;
             if(busXY.manhattanLength() < 3) {
                 drawConnectionToggle = true;
-                drawConnection = bus->con;
-                collectConnectionInfo(bus->con);
+                drawConnection = bus->connnecton;
+                collectConnectionInfo(bus->connnecton);
                 return;
             }
         }
