@@ -240,10 +240,14 @@ void connectionHandler::busUpdate(){
             if(bus->connnecton->closure) streetList = bus->connnecton->alternateStreets;
             if(bus->returning) streetList.reverse();
 
+            // Obtain current street information
+            tupleElem streetTuple = this->findStreet(bus->curStreet,streetList ,bus->streetIndex,false);
+            float streetTime = bus->curStreet->count_time();
+            bool direction = std::get<1>(streetTuple);
+
             // If the bus just entered it's timeOnStreet has already been updated
             if(!justEntered) bus->timeOnStreet += secondsPerTick;
-            if(bus->curStreet == std::get<0>(streetList.back()) && \
-               (bus->timeOnStreet >= bus->curStreet->count_time() / 2)){
+            if(streetTuple == streetList.back() && (bus->timeOnStreet >= bus->curStreet->count_time() / 2)){
                 // Bus has reached final stop
                 this->resetBus(bus);
                 continue;
@@ -252,13 +256,13 @@ void connectionHandler::busUpdate(){
             else if(bus->timeOnStreet >= bus->curStreet->count_time()){
                 // Bus has entered the following street
                 bus->timeOnStreet -= bus->curStreet->count_time();
-                bus->curStreet = std::get<0>(this->findStreet(bus->curStreet, streetList, bus->streetIndex, true));
+                streetTuple = this->findStreet(bus->curStreet, streetList, bus->streetIndex, true);
+                bus->curStreet = std::get<0>(streetTuple);
+                streetTime = bus->curStreet->count_time();
+                direction = std::get<1>(streetTuple);
                 bus->streetIndex++;
             }
-            // Obtain current street information
-            tupleElem streetTuple = this->findStreet(bus->curStreet,streetList ,bus->streetIndex,false);
-            float streetTime = bus->curStreet->count_time();
-            bool direction = std::get<1>(streetTuple);
+
             if(bus->returning) direction = !direction;
             // Calculate the position based on the direction of travel, and the ration of time already
             // traveled on street and the total time to pass the street
