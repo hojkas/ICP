@@ -805,6 +805,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QLabel" name="label_16">
+         <property name="text">
+          <string>normal       reverse     |   street name</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QTextBrowser" name="textBrowser_6">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
@@ -818,6 +825,13 @@
         <widget class="QLabel" name="label_8">
          <property name="text">
           <string>Current timetable:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_18">
+         <property name="text">
+          <string>normal       reverse     |   street name</string>
          </property>
         </widget>
        </item>
@@ -841,14 +855,7 @@
        <item>
         <widget class="QLabel" name="label_15">
          <property name="text">
-          <string>(r) - bus reached final stop and is</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="label_16">
-         <property name="text">
-          <string>        returning in opposite direction</string>
+          <string>(r) - bus going in reverse direction</string>
          </property>
         </widget>
        </item>
@@ -1083,6 +1090,8 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;To hide this guide, check it off on top of the left sidebar.&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;When in view mode, click on any bus to see details about all buses on this connection.&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;General timetable describes the time it takes for a bus to reach a given stop. The time displayed is not relative to the current time as it describes all buses on the given connection.&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;On the sidebar, street colour mode (default grey) and additional street information can be toggled.&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;

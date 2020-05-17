@@ -460,7 +460,7 @@ void MapWidget::onMapMoveDown()
 
 /** @} */
 
-/** @defgroup helpFunc Functions to collect data.*/
+/** @defgroup helpFunc Private functions to collect data.*/
 /** @{ */
 
 /** @brief Creates message about current state of time and sends it to widget to draw.
@@ -522,10 +522,10 @@ void MapWidget::collectConnectionInfo(connectionElem *con)
         if(bus->connnecton == con) {
             any = true;
             msg.append(createTimeString(bus->departure));
-            if(bus->onMap) {
-                msg.append("   (x)");
-                if(bus->returning) msg.append(" (r)");
-            }
+
+            if(bus->onMap || bus->returning) msg.append("    ");
+            if(bus->onMap) msg.append(" (x)");
+            if(bus->returning) msg.append(" (r)");
             msg.append("\n");
         }
     }
@@ -536,7 +536,10 @@ void MapWidget::collectConnectionInfo(connectionElem *con)
     msg = "";
     int time = 0;
     bool first_stop = true;
+    std::list<std::tuple<int, QString>> timetable;
     int extra = 0; //for leaving half of street with stop in case it was the last one
+
+
     for(std::tuple<Street*, bool, bool> street : con->streetList) {
         Street* s = std::get<0>(street);
         bool stop = std::get<2>(street);
@@ -555,11 +558,8 @@ void MapWidget::collectConnectionInfo(connectionElem *con)
                 time += (s->time / 2) + (s->time % 2);
                 extra = s->time / 2;
             }
-            msg.append(createTimeString(time));
-            msg.append("   |   ");
-            if(s->name.isEmpty()) msg.append("<" + QString::number(s->id) + ">");
-            else msg.append(s->name);
-            msg.append("\n");
+            if(s->name.isEmpty()) timetable.push_back(std::make_tuple(time, "<" + QString::number(s->id) + ">"));
+            else timetable.push_back(std::make_tuple(time, s->name));//msg.append(s->name);
         }
         else {
             //not stop
@@ -570,6 +570,16 @@ void MapWidget::collectConnectionInfo(connectionElem *con)
             }
         }
     }
+
+    //making message out of collected tuple list
+    for(std::tuple<int, QString> stop : timetable) {
+        msg.append(createTimeString(std::get<0>(stop)));
+        msg.append("   ");
+        msg.append(createTimeString((time - std::get<0>(stop))));
+        msg.append("   |   ");
+        msg.append(std::get<1>(stop));
+        msg.append("\n");
+    }
     emit conGenTT(msg);
 
     //generating current timetable info
@@ -577,6 +587,7 @@ void MapWidget::collectConnectionInfo(connectionElem *con)
     time = 0;
     first_stop = true;
     extra = 0; //for leaving half of street with stop in case it was the last one
+    timetable.clear();
 
     //if there is closure, it will count timetable from alternate street list (aka list of street including detour)
     //if there is none, it will do so from standart street list
@@ -602,11 +613,8 @@ void MapWidget::collectConnectionInfo(connectionElem *con)
                 time += (s->count_time() / 2) + (s->count_time() % 2);
                 extra = s->count_time() / 2;
             }
-            msg.append(createTimeString(time));
-            msg.append("   |   ");
-            if(s->name.isEmpty()) msg.append("<" + QString::number(s->id) + ">");
-            else msg.append(s->name);
-            msg.append("\n");
+            if(s->name.isEmpty()) timetable.push_back(std::make_tuple(time, "<" + QString::number(s->id) + ">"));
+            else timetable.push_back(std::make_tuple(time, s->name));//msg.append(s->name);
         }
         else {
             //not stop
@@ -616,6 +624,15 @@ void MapWidget::collectConnectionInfo(connectionElem *con)
                 extra = 0;
             }
         }
+    }
+    //making message out of collected tuple list
+    for(std::tuple<int, QString> stop : timetable) {
+        msg.append(createTimeString(std::get<0>(stop)));
+        msg.append("   ");
+        msg.append(createTimeString((time - std::get<0>(stop))));
+        msg.append("   |   ");
+        msg.append(std::get<1>(stop));
+        msg.append("\n");
     }
     emit conCurTT(msg);
 
