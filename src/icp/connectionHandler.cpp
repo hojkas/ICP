@@ -42,16 +42,16 @@ void connectionHandler::loadConnections(std::list<Street*> streetList)
         exit(1);
     }
 
-    for(int i = 0; i < jArray.size() ; i++){
+    for(int it = 0; it < jArray.size() ; it++){
         connectionElem con;
-        QJsonObject obj = jArray[i].toObject();
+        QJsonObject obj = jArray[it].toObject();
         con.name = obj["name"].toString();
         con.closure = false;
         QJsonArray streetArray = obj["streets"].toArray();
-        for(int a = 0; a < streetArray.size(); a++){
-            int streetID = streetArray[a].toObject()["id"].toInt();
-            bool direction = streetArray[a].toObject()["right_direction"].toBool();
-            bool stop = streetArray[a].toObject()["stop"].toBool();
+        for(int it2 = 0; it2 < streetArray.size(); it2++){
+            int streetID = streetArray[it2].toObject()["id"].toInt();
+            bool direction = streetArray[it2].toObject()["right_direction"].toBool();
+            bool stop = streetArray[it2].toObject()["stop"].toBool();
             Street* streetPtr;
             for(Street *street: streetList){
                 if (street->id == streetID) {
@@ -63,12 +63,12 @@ void connectionHandler::loadConnections(std::list<Street*> streetList)
         }
         conList.push_back(con);
         QJsonArray busArray = obj["buses"].toArray();
-        for(int a = 0; a < busArray.size(); a++){
+        for(int it2 = 0; it2 < busArray.size(); it2++){
 
             bool onMap = false;
             connectionElem *con =  &conList.back();
-            bool returning = busArray[a].toObject()["return"].toBool();
-            int departure = busArray[a].toObject()["time"].toInt();
+            bool returning = busArray[it2].toObject()["return"].toBool();
+            int departure = busArray[it2].toObject()["time"].toInt();
             int timeOnStreet = 0;
             Street *currStreet;
             if (returning) currStreet = std::get<0>(con->streetList.back());
