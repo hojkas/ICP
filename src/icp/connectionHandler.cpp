@@ -10,7 +10,7 @@
 busElem::busElem(bool map, connectionElem *connection, int dep, int tOS, int X, int Y, Street *strt, bool r)
 {
     onMap = map;
-    con = connection;
+    connnecton = connection;
     departure = dep;
     timeOnStreet = tOS;
     x = X;
@@ -30,13 +30,23 @@ connectionHandler::~connectionHandler()
     for(busElem *bus : busList) delete bus;
 }
 
+/**
+ * @brief Creates all connectionElem and busElem objects according to the "../../examples/connections.json" file
+ * @param streetList List off all streets on the map
+ * When called, loads the contents of the connections.json file and extracts all the information
+ * necessary to successfully create all the elements. If any error occours while loading the file or
+ * parsing the JSON structure, the program is ended with the return code of 1 and an error message is
+ * printed in the std::cerr stream.
+ */
 void connectionHandler::loadConnections(std::list<Street*> streetList)
 {
     QJsonDocument jsonDocument;
     BackEnd backEnd;
+    // Error in loading from file
     if(!(backEnd.loadFile("../../examples/connections.json", &jsonDocument))){
         exit(1);
     }
+    // Unexpected data in JSON file
     if(!jsonDocument.isArray()){
         std::cerr << "Loaded json document is not an array";
         exit(1);
@@ -48,75 +58,118 @@ void connectionHandler::loadConnections(std::list<Street*> streetList)
         exit(1);
     }
 
-    for(int i = 0; i < jArray.size() ; i++){
-        connectionElem con;
-        QJsonObject obj = jArray[i].toObject();
-        con.name = obj["name"].toString();
-        con.closure = false;
-        QJsonArray streetArray = obj["streets"].toArray();
-        for(int a = 0; a < streetArray.size(); a++){
-            int streetID = streetArray[a].toObject()["id"].toInt();
-            bool direction = streetArray[a].toObject()["right_direction"].toBool();
-            bool stop = streetArray[a].toObject()["stop"].toBool();
+    // Load all connections
+    for(int it = 0; it < jArray.size() ; it++){
+        connectionElem connection;
+        QJsonObject connectionObj = jArray[it].toObject();
+        // Load all connection information
+        connection.name = connectionObj["name"].toString();
+        connection.closure = false;
+        QJsonArray streetArray = connectionObj["streets"].toArray();
+        // Load all streets of the connection
+        for(int it2 = 0; it2 < streetArray.size(); it2++){
+            // Load all street information
+            int streetID = streetArray[it2].toObject()["id"].toInt();
+            bool direction = streetArray[it2].toObject()["right_direction"].toBool();
+            bool stop = streetArray[it2].toObject()["stop"].toBool();
             Street* streetPtr;
+            // Find street in streetList
             for(Street *street: streetList){
                 if (street->id == streetID) {
                     streetPtr = street;
                 }
             }
+            // Push street to connections streetList
             tupleElem street(streetPtr,direction,stop);
-            con.streetList.push_back(street);
+            connection.streetList.push_back(street);
         }
-        conList.push_back(con);
-        QJsonArray busArray = obj["buses"].toArray();
-        for(int a = 0; a < busArray.size(); a++){
-
+        conList.push_back(connection);
+        QJsonArray busArray = connectionObj["buses"].toArray();
+        // Load all buses on the connection
+        for(int it2 = 0; it2 < busArray.size(); it2++){
+            // Load or set all bus information
             bool onMap = false;
-            connectionElem *con =  &conList.back();
-            bool returning = busArray[a].toObject()["return"].toBool();
-            int departure = busArray[a].toObject()["time"].toInt();
             int timeOnStreet = 0;
-            Street *currStreet;
+            bool returning = busArray[it2].toObject()["return"].toBool();
+            int departure = busArray[it2].toObject()["time"].toInt();
+            connectionElem *con =  &conList.back();
+            Street *currStreet = std::get<0>(con->streetList.front());
             if (returning) currStreet = std::get<0>(con->streetList.back());
-            else currStreet = std::get<0>(con->streetList.front());
             int x = (currStreet->x1 + currStreet->x2) / 2;
             int y = (currStreet->y1 + currStreet->y2) / 2;
+            // Construct busElem
             busElem* bus = new busElem(onMap, con, departure, timeOnStreet, x, y, currStreet, returning);
             busList.push_back(bus);
         }
     }
  }
 
+/**
+ * @brief Prints the IDs of all streets within a connection
+ * Mainly for debugging purposes.
+ */
 void connectionHandler::printConnections()
 {
     for(connectionElem con : conList){
-        qDebug() << con.closure;
-        for(tupleElem street : con.alternateStreets){
+        qDebug() << "Connection -" << con.name;
+        qDebug() << "Streets:";
+        for(tupleElem street : con.streetList){
             qDebug() << std::get<0>(street)->id;
         }
         qDebug() << "-----------------";
     }
 }
-
+/**
+ * @brief Prints the closure status of all streets within a connection
+ * Mainly for debugging purposes.
+ */
+void connectionHandler::printClosures()
+{
+    for(connectionElem con : conList){
+        qDebug() << "Connection -" << con.name;
+        qDebug() << "Closure:" << con.closure;
+        if(con.closure){
+            for(tupleElem street : con.alternateStreets){
+                qDebug() << std::get<0>(street)->id;
+            }
+        }
+        qDebug() << "-----------------";
+    }
+}
+/**
+ * @brief Prints the all the currently active buse
+ * Mainly for debugging purposes.
+ */
 void connectionHandler::printBuses()
 {
     qDebug() << "------BUSES---------";
     for(busElem* bus : busList){
-        if(bus->onMap) qDebug() <<"Connection" << bus->con->name << "Street:" << bus->curStreet->id << "Time spent on street:" << bus->timeOnStreet <<"X:" <<bus->x << "Y:" << bus->y;
+        if(bus->onMap) qDebug() <<"Connection" << bus->connnecton->name << "Street:" << bus->curStreet->id << "Time spent on street:" << bus->timeOnStreet <<"X:" <<bus->x << "Y:" << bus->y;
     }
 }
 
+/**
+ * @brief Finds the tupleElem containing the currStreet in the desired tupleList
+ * @param currStreet Street to search for
+ * @param streetList tupleList to search in
+ * @param streetIndex Index of the desired street
+ * @param next return the next element instead
+ * @return tupleElem with currStreet, or if next is true, returns the following tupleElem
+ * First tries to find the element according to the streetIndex position, if no match is found, searches
+ * the streetList again, and looks for the first match.
+ */
 tupleElem connectionHandler::findStreet(Street* currStreet, tupleList streetList, int streetIndex, bool next)
 {
     bool found = false;
     auto it = begin(streetList);
     advance(it, streetIndex);
     if(std::get<0>(*it) == currStreet){
+        // Found object at expected streetIndex
         if(next) return *(++it);
         else return *it;
     }
     else{
-        qDebug() << "Not found through itter";
+        // Try to find first matching street
         for(tupleElem streetTuple : streetList){
             Street * street = std::get<0>(streetTuple);
             if(found) return streetTuple;
@@ -126,56 +179,82 @@ tupleElem connectionHandler::findStreet(Street* currStreet, tupleList streetList
             }
         }
     }
+    std::cerr << "Internal error: findStreet - No street found.";
+    exit(99);
 }
 
+/**
+ * @brief Resets the busElem so it is "ready" to depart again
+ * @param bus busElem to reset to default values
+ * Resets the busElem so the correct values are set for the next departure
+ */
 void connectionHandler::resetBus(busElem* bus)
 {
+    // Reset starting values
     bus->onMap = false;
-    if(bus->returning) std::get<0>(bus->con->streetList.back());
-    else bus->curStreet = std::get<0>(bus->con->streetList.front());
+    if(bus->returning) bus->curStreet = std::get<0>(bus->connnecton->streetList.back());
+    else bus->curStreet = std::get<0>(bus->connnecton->streetList.front());
     bus->x = bus->curStreet->x1;
     bus->y = bus->curStreet->y1;
     bus->streetIndex = 0;
     bus->timeOnStreet = 0;
 }
 
+/**
+ * @brief Updates the position of all busElems
+ * Every call of the busUpdate() function is treated as 30 seconds passing, marked by the
+ * secodnsPerTick variable. The function also updates whether a current bus is to be drawn on the map.
+ * If the bus is to be displayed, the function takes into account the direction of it's travel, whether
+ * it's on a return route and calculates it's current X and Y coordinates accordingly.
+ * It also updates the "curStreet" property of the busElem and calls the resetBus() function when a
+ * bus has reached it's final stop.
+ */
 void connectionHandler::busUpdate(){
     int secondsPerTick = 30;
     currentTime = currentTime.addSecs(secondsPerTick);
     QTime temp;
     temp.setHMS(0,0,0,0);
+    // Calculate time since midnight
     timePassed = temp.secsTo(currentTime);
-    for(busElem *bus: busList){
 
+    for(busElem *bus: busList){
         bool justEntered = false;
         if(!bus->onMap){
             if(bus->departure < timePassed && (timePassed - bus->departure) <= secondsPerTick){
+                // Bus becomes active
                 bus->onMap = true;
                 bus->timeOnStreet = bus->curStreet->count_time() / 2;
                 justEntered = true;
             }
         }
         if(bus->onMap){
-            tupleList streetList = bus->con->streetList;
-            if(bus->con->closure) streetList = bus->con->alternateStreets;
+            // Set the correct list of streets
+            tupleList streetList = bus->connnecton->streetList;
+            if(bus->connnecton->closure) streetList = bus->connnecton->alternateStreets;
             if(bus->returning) streetList.reverse();
 
+            // If the bus just entered it's timeOnStreet has already been updated
             if(!justEntered) bus->timeOnStreet += secondsPerTick;
             if(bus->curStreet == std::get<0>(streetList.back()) && \
                (bus->timeOnStreet >= bus->curStreet->count_time() / 2)){
+                // Bus has reached final stop
                 this->resetBus(bus);
                 continue;
             }
+
             else if(bus->timeOnStreet >= bus->curStreet->count_time()){
+                // Bus has entered the following street
                 bus->timeOnStreet -= bus->curStreet->count_time();
                 bus->curStreet = std::get<0>(this->findStreet(bus->curStreet, streetList, bus->streetIndex, true));
                 bus->streetIndex++;
             }
-            tupleElem streetTuple;
-            streetTuple = this->findStreet(bus->curStreet,streetList ,bus->streetIndex,false);
+            // Obtain current street information
+            tupleElem streetTuple = this->findStreet(bus->curStreet,streetList ,bus->streetIndex,false);
             float streetTime = bus->curStreet->count_time();
             bool direction = std::get<1>(streetTuple);
             if(bus->returning) direction = !direction;
+            // Calculate the position based on the direction of travel, and the ration of time already
+            // traveled on street and the total time to pass the street
             if(direction){
                 bus->x = (bus->curStreet->x1 + (bus->timeOnStreet/streetTime) * \
                         (bus->curStreet->x2 - bus->curStreet->x1));
@@ -193,6 +272,13 @@ void connectionHandler::busUpdate(){
     emit busUpdated();
 }
 
+/**
+ * @brief The "root" fucntion of creating a closure on a street. Calls the updateClosure() and shortenPath() functions.
+ * @param closed Street to be closed
+ * @param alternativeStreets Streets to follow instead
+ * The function find all connections with the closed street and updates their values accordingly, by
+ * calling for the updateClosure() and shortenPath() functions.
+ */
 void connectionHandler::createClosure(Street* closed, std::list<Street*> alternativeStreets)
 {
     for(auto i = begin(conList); i != end(conList); i++){
@@ -203,6 +289,7 @@ void connectionHandler::createClosure(Street* closed, std::list<Street*> alterna
         for(auto streetTuple : streetList){
             Street *street = std::get<0>(streetTuple);
             if(street == closed){
+                // Street to be closed found - updated the necessary infromation
                 if(conPtr->closure){
                     conPtr->alternateStreets = this->updateClosure(closed, alternativeStreets, conPtr->alternateStreets);
                     conPtr->alternateStreets = this->shortenPath(conPtr->alternateStreets);
@@ -218,9 +305,9 @@ void connectionHandler::createClosure(Street* closed, std::list<Street*> alterna
     }
 }
 
-/* @brief Function goes through streetList, checks if two same streets are next to each other without stop, and removes such (recursively if needed)
- * @param tupleList List of all streets of connection.
- * @return tupleList list of connection with removed duplicit streets.
+/** @brief Function goes through streetList, checks if two same streets are next to each other without stop, and removes such (recursively if needed)
+  * @param tupleList List of all streets of connection.
+  * @return tupleList list of connection with removed duplicit streets.
  */
 tupleList connectionHandler::shortenPath(tupleList streetList)
 {
@@ -254,39 +341,53 @@ tupleList connectionHandler::shortenPath(tupleList streetList)
     else return newList;
 }
 
+/**
+ * @brief Replaces the closed street with the go-around route in the given streetList
+ * @param closed Street to be replaced
+ * @param alternateStreets Streets to replace with
+ * @param streetList Streets to create closure on
+ * @return Updated list of streets with closure completed
+ */
 tupleList connectionHandler::updateClosure(Street* closed, std::list<Street*> alternateStreets, tupleList streetList)
 {
-    // Create return list of the alternate Route
+    // Return list
     tupleList alternateList;
-   // Go through every street
+
     for(tupleElem streetTuple : streetList){
-        // Obtain the street pointer and the direction
         Street *street = std::get<0>(streetTuple);
         bool direction = std::get<1>(streetTuple);
-        // If the street is closed, do not push to the new list
-        if(street == closed){
-            // Determining the direction of first element is oposite to the rest
-            Street* altStreet = alternateStreets.front();
 
+        if(street == closed){
+            Street* altStreet = alternateStreets.front();
+            // Setting the direction of the new street based on it's position to ensure a continous route
             if(direction){
                 if(street->x1 == altStreet->x2 && street->y1 == altStreet->y2){
                     direction = false;
                 }
+                // Technically reduntant, as the next else could be replaced with a negation of
+                // this condition. However, kept for easier readability of code
                 else if(street->x1 == altStreet->x1 && street->y1 == altStreet->y1){
                     direction = true;
                 }
                 else{
+                    // The alternateStreets were input in the "opposite" direction in respect to
+                    // the direction of the connection
                     alternateStreets.reverse();
                     altStreet = alternateStreets.front();
+                    // Repeat of the above conditions to set the direction
                     if(street->x1 == altStreet->x2 && street->y1 == altStreet->y2){
                         direction = false;
                     }
                     else if(street->x1 == altStreet->x1 && street->y1 == altStreet->y1){
                         direction = true;
                     }
+                    else{
+                        std::cerr << "Internal error on line 369";
+                        exit(99);
+                    }
                 }
             }
-
+            // Similar functionality to the if branch
             else{
                 if(street->x2 == altStreet->x1 && street->y2 == altStreet->y1){
                     direction = true;
@@ -308,10 +409,10 @@ tupleList connectionHandler::updateClosure(Street* closed, std::list<Street*> al
             // Add the first street to the list
             tupleElem temp(altStreet, direction, false);
             alternateList.push_back(temp);
-            // In the for loop Street* street represents the previous street and direction
+
+            // In the following for loop Street* street represents the previous street and direction
             // represents the direction of the previous street
             street = alternateStreets.front();
-            // Go through the entire list of alternate streets
             for(Street* altStreet : alternateStreets){
                 // First element was already handled
                 if(altStreet == alternateStreets.front()) continue;
@@ -329,15 +430,14 @@ tupleList connectionHandler::updateClosure(Street* closed, std::list<Street*> al
                     }
                 }
                 tupleElem temp(altStreet, direction, false);
-                // Add to the list
                 alternateList.push_back(temp);
                 // Set previous street
                 street = altStreet;
             }
 
         }
-        // if the street is not closed, push to the list
         else{
+            // If the street is not closed, push to the list
             alternateList.push_back(streetTuple);
         }
     }

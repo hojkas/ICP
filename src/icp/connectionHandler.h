@@ -16,7 +16,12 @@
 #include <time.h>
 #include "street.h"
 
+// Added for easier readability
+// tupleElem represents a single street in for a connection.
+// The tuple consists of a Street pointer, boolean to mark direction of travel
+// and boolean to mark whether the street is a stop on the respective connection
 using tupleElem = std::tuple<Street*, bool, bool>;
+// tupleList represents a list of streets
 using tupleList = std::list<tupleElem>;
 
 class connectionElem
@@ -32,7 +37,7 @@ class busElem
 {
 public:
     bool onMap;
-    connectionElem* con;
+    connectionElem* connnecton;
     int departure;
     int timeOnStreet;
     float x;
@@ -49,24 +54,29 @@ class connectionHandler : public QObject
 public:
     explicit connectionHandler(QObject *parent = nullptr);
     ~connectionHandler();
+    // Variables for access in mapwidget
     QTime currentTime;
     std::list<connectionElem> conList;
     std::list<busElem*> busList;
+    // Functions called from mapwidget.cpp
     void loadConnections(std::list<Street *> street_list);
     void resetBus(busElem* bus);
-    auto createAltRoute(std::list<Street*> altStreets, connectionElem *connection, Street* closed);
-    tupleElem findStreet(Street* currStreet, tupleList streetList, int streetIndex, bool next);
     void createClosure(Street* closed, std::list<Street*> alternativeStreets);
-    tupleList updateClosure(Street* closed, std::list<Street*> alternateStreets, tupleList streetList);
-    tupleList shortenPath(tupleList streetList);
 
 signals:
+    // Bus postions updated
     void busUpdated();
 public slots:
+    // Functions called by &QTimer::timeout()
+    void busUpdate();
+    // Debug functions
     void printConnections();
     void printBuses();
-    void busUpdate();
+    void printClosures();
  private:
+    tupleElem findStreet(Street* currStreet, tupleList streetList, int streetIndex, bool next);
+    tupleList updateClosure(Street* closed, std::list<Street*> alternateStreets, tupleList streetList);
+    tupleList shortenPath(tupleList streetList);
     int timePassed;
 };
 #endif // CONNECTION_H
