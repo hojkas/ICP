@@ -18,7 +18,8 @@ Information about streets is stored here. Each street has its unique id, time it
 
 # connections.json
 
-TODO Denis
+Information about all connections and the buses operation on them is stored in this file. Each connection must be named, and all streets must contain their respective unique id which must match a street denoted in map.json. Other than the UID each street contain 2 booleans - 'right_direction' denotes whether the direction of travel is from the street start to the end or end to start, while 'stop' denotes whether the street has a bus stop or not.
+For buses, each bus contains the departure time in seconds since midnight, denoted by 'time' , and 'return' marks whether the bus is going in the opposite direction.
 
 # Error Codes
 

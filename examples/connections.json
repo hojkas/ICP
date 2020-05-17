@@ -4,35 +4,115 @@
 	"streets":
 	[
 		{
-			"id": 2,
-            "right_direction": true,
+            "id": 10,
+            "right_direction":false,
+			"stop":true
+		},
+		{
+            "id": 7,
+            "right_direction":true,
 			"stop": true
 		},
 		{
-			"id": 3,
+			"id": 24,
+            "right_direction": false,
+			"stop": true
+		},
+		{
+			"id": 26,
             "right_direction":true,
 			"stop": false
 		},
 		{
-            "id": 5,
-            "right_direction":false,
+            "id": 21,
+            "right_direction":true,
 			"stop":false
 		},
 		{
-            "id": 4,
-            "right_direction":false,
+            "id": 20,
+            "right_direction":true,
+			"stop": false
+		},
+		{
+            "id": 27,
+            "right_direction":true,
 			"stop": true
 		}
 	],
 	"buses":
 	[
+
 		{
 			"time":0,
 			"return":false
 		},
 		{
-            "time":300,
+            "time":615,
+			"return":true
+		},
+		{
+			"time":300,
 			"return":false
+		},
+		{
+            "time":915,
+			"return":true
+		},
+		{
+			"time":600,
+			"return":false
+		},
+		{
+            "time":1215,
+			"return":true
+		},
+		{
+			"time":900,
+			"return":false
+		},
+		{
+            "time":1515,
+			"return":true
+		},
+		{
+			"time":1200,
+			"return":false
+		},
+		{
+            "time":1815,
+			"return":true
+		},
+		{
+			"time":1500,
+			"return":true
+		},
+		{
+            "time":2115,
+			"return":true
+		},
+		{
+			"time":1800,
+			"return":true
+		},
+		{
+            "time":2415,
+			"return":true
+		},
+		{
+			"time":2100,
+			"return":true
+		},
+		{
+            "time":2715,
+			"return":true
+		},
+		{
+			"time":2400,
+			"return":true
+		},
+		{
+            "time":3015,
+			"return":true
 		}
 	]
 },
@@ -40,6 +120,11 @@
     "name":"C2",
     "streets":
     [
+    	{
+            "id": 4,
+            "right_direction": true,
+            "stop": true
+        },
         {
             "id": 5,
             "right_direction": true,
@@ -54,17 +139,146 @@
             "id": 2,
             "right_direction":false,
             "stop": true
+        },
+        {
+            "id": 4,
+            "right_direction": true,
+            "stop": false
         }
     ],
     "buses":
     [
         {
-            "time":15,
+            "time":30,
             "return":false
         },
         {
-            "time":345,
+            "time":330,
+            "return":true
+        },
+        {
+            "time":210,
+            "return":true
+        },
+        {
+            "time":630,
             "return":false
+        },
+        {
+            "time":510,
+            "return":true
+        },
+        {
+            "time":930,
+            "return":false
+        },
+        {
+            "time":810,
+            "return":true
+        },
+        {
+            "time":1230,
+            "return":false
+        },
+        {
+            "time":1110,
+            "return":true
+        },
+        {
+            "time":1530,
+            "return":false
+        },
+        {
+            "time":1410,
+            "return":true
+        },
+        {
+            "time":1830,
+            "return":false
+        },
+        {
+            "time":1710,
+            "return":true
+        },
+        {
+            "time":2130,
+            "return":false
+        },
+        {
+            "time":2010,
+            "return":true
+        },
+        {
+            "time":2430,
+            "return":false
+        },
+        {
+            "time":2310,
+            "return":true
+        },
+        {
+            "time":2730,
+            "return":false
+        },
+        {
+            "time":2610,
+            "return":true
+        },
+        {
+            "time":3030,
+            "return":false
+        },
+        {
+            "time":2910,
+            "return":true
+        },
+        {
+            "time":3330,
+            "return":false
+        },
+        {
+            "time":3210,
+            "return":true
+        },
+        {
+            "time":3630,
+            "return":false
+        },
+        {
+            "time":3510,
+            "return":true
+        },
+        {
+            "time":3930,
+            "return":false
+        },
+        {
+            "time":3810,
+            "return":true
+        },
+        {
+            "time":4230,
+            "return":false
+        },
+        {
+            "time":4110,
+            "return":true
+        },
+        {
+            "time":4530,
+            "return":false
+        },
+        {
+            "time":4410,
+            "return":true
+        },
+        {
+            "time":4910,
+            "return":false
+        },
+        {
+            "time":4810,
+            "return":true
         }
     ]
 },
@@ -83,18 +297,43 @@
 			"stop": false
 		},
 		{
-            "id": 21,
+            "id": 20,
+            "right_direction":true,
+			"stop":false
+		},
+		{
+            "id": 22,
+            "right_direction":true,
+			"stop": true
+		},
+		{
+            "id": 17,
+            "right_direction":true,
+			"stop": true
+		},
+		{
+			"id": 16,
+            "right_direction": false,
+			"stop": true
+		},
+		{
+			"id": 12,
+            "right_direction":false,
+			"stop": false
+		},
+		{
+            "id": 9,
             "right_direction":false,
 			"stop":false
 		},
 		{
-            "id": 26,
+            "id": 6,
             "right_direction":false,
 			"stop": true
 		},
 		{
-            "id": 25,
-            "right_direction":false,
+            "id": 1,
+            "right_direction":true,
 			"stop": true
 		}
 	],
@@ -102,11 +341,83 @@
 	[
 		{
 			"time":0,
+			"return":false
+		},
+		{
+            "time":600,
 			"return":true
 		},
 		{
-            "time":300,
+			"time":1800,
 			"return":false
+		},
+		{
+            "time":2400,
+			"return":true
+		},
+		{
+			"time":3600,
+			"return":false
+		},
+		{
+            "time":4200,
+			"return":true
+		},
+		{
+			"time":5400,
+			"return":false
+		},
+		{
+            "time":6000,
+			"return":true
+		},
+		{
+			"time":7200,
+			"return":false
+		},
+		{
+            "time":7800,
+			"return":true
+		},
+		{
+			"time":9000,
+			"return":false
+		},
+		{
+            "time":9600,
+			"return":true
+		},
+		{
+			"time":10800,
+			"return":false
+		},
+		{
+            "time":11400,
+			"return":true
+		},
+		{
+			"time":12600,
+			"return":false
+		},
+		{
+            "time":13200,
+			"return":true
+		},
+		{
+			"time":15400,
+			"return":false
+		},
+		{
+            "time":16000,
+			"return":true
+		},
+		{
+			"time":17200,
+			"return":false
+		},
+		{
+			"time":17800,
+			"return":true
 		}
 	]
 }
