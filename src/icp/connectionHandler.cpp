@@ -174,6 +174,7 @@ tupleElem connectionHandler::findStreet(Street* currStreet, tupleList streetList
         else return *it;
     }
     else{
+        qDebug() << "Not through itter";
         // Try to find first matching street
         for(tupleElem streetTuple : streetList){
             Street * street = std::get<0>(streetTuple);
@@ -249,11 +250,14 @@ void connectionHandler::busUpdate(){
             if(!justEntered) bus->timeOnStreet += secondsPerTick;
             if(streetTuple == streetList.back() && (bus->timeOnStreet >= bus->curStreet->count_time() / 2)){
                 // Bus has reached final stop
-                this->resetBus(bus);
-                continue;
+                if(bus->streetIndex != 0){
+                    // if condition in case the connection is a circle
+                    this->resetBus(bus);
+                    continue;
+                }
             }
 
-            else if(bus->timeOnStreet >= bus->curStreet->count_time()){
+            if(bus->timeOnStreet >= bus->curStreet->count_time()){
                 // Bus has entered the following street
                 bus->timeOnStreet -= bus->curStreet->count_time();
                 streetTuple = this->findStreet(bus->curStreet, streetList, bus->streetIndex, true);
