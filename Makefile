@@ -1,7 +1,7 @@
 # ICP projekt: Makefile
 # xstrna14, xlebod00
 
-SOURCE_DIR = src/icp
+SOURCE_DIR = src
 EXAMPLE_DIR = examples/
 SRC_FILES = $(SOURCE_DIR)/backend.cpp \
 		   	$(SOURCE_DIR)/backend.h \
@@ -27,7 +27,7 @@ run:
 	@cd $(SOURCE_DIR) && ./icp
 
 doxygen:
-	doxygen doxyConfig
+	@doxygen doxyConfig
 
 clean:
 	@cd $(SOURCE_DIR) && [ -f Makefile ] && [ -f main.o ] && make -s clean || :
