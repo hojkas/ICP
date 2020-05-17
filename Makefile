@@ -13,7 +13,9 @@ SRC_FILES = $(SOURCE_DIR)/backend.cpp \
 			$(SOURCE_DIR)/mapwidget.cpp \
 			$(SOURCE_DIR)/mapwidget.h \
 			$(SOURCE_DIR)/street.cpp \
-			$(SOURCE_DIR)/street.h 
+			$(SOURCE_DIR)/street.h \
+			$(SOURCE_DIR)/icp.pro  \
+			$(SOURCE_DIR)/mainwindow.ui
 JSON_FILES = $(EXAMPLE_DIR)/connections.json \
 				$(EXAMPLE_DIR)/map.json
 
