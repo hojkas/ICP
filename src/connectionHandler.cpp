@@ -44,7 +44,7 @@ void connectionHandler::loadConnections(std::list<Street*> streetList)
     QJsonDocument jsonDocument;
     BackEnd backEnd;
     // Error in loading from file
-    if(!(backEnd.loadFile("../../examples/connections.json", &jsonDocument))){
+    if(!(backEnd.loadFile("../examples/connections.json", &jsonDocument))){
         exit(1);
     }
     // Unexpected data in JSON file

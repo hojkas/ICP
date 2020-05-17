@@ -71,7 +71,7 @@ void AllStreets::loadStreets()
 
 
     //opening document with json, checking if it's not in undesired format
-    if(!(backEnd.loadFile("../../examples/map.json", &jsonDocument))){
+    if(!(backEnd.loadFile("../examples/map.json", &jsonDocument))){
         exit(2);
     }
     if(!jsonDocument.isArray()){
