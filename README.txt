@@ -3,4 +3,27 @@
 Iveta Strnadová (xstrna14)
 Denis Lebó (xlebod00)
 
-# TODO
+# About
+
+Application shows map, connections and buses on them. It simulates bus movement according to simulation time.
+
+Map data is loaded from ./examples/map.json.
+Connections and bus departures are loaded from ./examples/connections.json.
+
+On left side of UI, user can adjust currently viewed information (such as name of streets, color scheme according to traffic levels, etc.), can modify time and make interactions with map - adjust traffic levels or create/delete street closures.
+
+# map.json
+
+Information about streets is stored here. Each street has its unique id, time it takes to ride through, coordinates x and y where it starts, coordinates where it ends. Those coordinates must be within <0, 100>. Street can also have a name, but doesn't need to.
+
+# connections.json
+
+TODO Denis
+
+# Error Codes
+
+If fatal error occurs, application is exited with following return code.
+
+1 - "connections.json" file is invalid or contains unexpected information
+2 - "map.json" file is invalid or contains unexpected information
+99 - internal error
