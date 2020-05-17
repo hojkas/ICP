@@ -109,10 +109,10 @@ signals:
 
     //map zoom/pan symbols signals
     void adjustMapZoom(int);                /**< Sends new value to map zoom slider.*/
-    void allowMapMoveRight(bool);           /**< Bool decides whether move move right button is clickable or not.*/
-    void allowMapMoveLeft(bool);            /**< Bool decides whether move move left button is clickable or not.*/
-    void allowMapMoveUp(bool);              /**< Bool decides whether move move up button is clickable or not.*/
-    void allowMapMoveDown(bool);            /**< Bool decides whether move move down button is clickable or not.*/
+    void allowMapMoveRight(bool);           /**< Bool decides whether move map right button is clickable or not.*/
+    void allowMapMoveLeft(bool);            /**< Bool decides whether move map left button is clickable or not.*/
+    void allowMapMoveUp(bool);              /**< Bool decides whether move map up button is clickable or not.*/
+    void allowMapMoveDown(bool);            /**< Bool decides whether move map down button is clickable or not.*/
 
     //quickguide selection
     void show1(bool);                       /**< If true, shows panel #1 in quickguide. Hides it if false.*/
