@@ -66,16 +66,16 @@ void AllStreets::loadStreets()
 
     //opening document with json, checking if it's not in undesired format
     if(!(backEnd.loadFile("../../examples/map.json", &jsonDocument))){
-        exit(1);
+        exit(2);
     }
     if(!jsonDocument.isArray()){
         std::cerr << "Loaded json document is not an array";
-        exit(1);
+        exit(2);
     }
     QJsonArray jArray = jsonDocument.array();
     if(jArray.isEmpty()){
         std::cerr << "Loaded array is empty";
-        exit(1);
+        exit(2);
     }
 
     //Cycle for going through each json object, creating Street object of it and appending to AllStreets list
@@ -86,7 +86,7 @@ void AllStreets::loadStreets()
         if(!obj.contains("x1") || !obj.contains("x2") || !obj.contains("y1") || !obj.contains("y2") || !obj.contains("time") ||
                 !obj.contains("id")) {
             std::cerr << "Missing vital information about " << i+1 << ". street in file.";
-            exit(1);
+            exit(2);
         }
 
         Street *new_street = new Street(obj["x1"].toInt(), obj["y1"].toInt(), obj["x2"].toInt(), obj["y2"].toInt(), obj["id"].toInt(), obj["time"].toInt(), obj["name"].toString());
