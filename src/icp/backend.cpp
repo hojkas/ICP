@@ -1,3 +1,9 @@
+/**
+ * @file backend.h
+ * @author xlebod00
+ * @brief Class for loading information from external files.
+ */
+
 #include "backend.h"
 
 

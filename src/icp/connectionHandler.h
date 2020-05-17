@@ -1,3 +1,9 @@
+/**
+ * @file connectionHandler.h
+ * @author xstrna14, xlebod00
+ * @brief Class for storing information about connections.
+ */
+
 #ifndef CONNECTION_H
 #define CONNECTION_H
 

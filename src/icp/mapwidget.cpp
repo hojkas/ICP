@@ -1,8 +1,9 @@
 /**
  * @file mapwidget.cpp
  * @author xstrna14, xlebod00
- * @brief TODO
- * Additional description TODO
+ * @brief Class to handle all communication with Map widget and its display.
+ * Class emits signals to UI to hide/display information, overrides paint and mouse events
+ * and accepts many signals from UI and reacts to them.
  */
 
 #include "mapwidget.h"
@@ -56,6 +57,14 @@ MapWidget::~MapWidget()
     //delete updateClock;
 }
 
+/** @defgroup slots Slot functions to handle signals from UI.
+ * @{ */
+
+/** @brief Function to handle Quickguide selection.
+ * @param val New value of quickguide.
+ * Based on value of dropdown menu of quickguide, set of signals
+ * is emitted to hide all information text windows but one.
+ */
 void MapWidget::onQuickguideSelection(int val)
 {
     if(val == 0) emit show0(true);
@@ -70,6 +79,10 @@ void MapWidget::onQuickguideSelection(int val)
     else emit show4(false);
 }
 
+/** @brief Handles press of "Reset Time" button.
+ * When pressed, simulation time is set to zero and all
+ * on all busElem is called resetting function.
+ */
 void MapWidget::onResetButtonPress()
 {
     conHandler->currentTime.setHMS(0,0,0);
@@ -80,6 +93,11 @@ void MapWidget::onResetButtonPress()
     update();
 }
 
+/** @brief Handles check of Display Street Info: Names.
+ * @param bool Whether the button is checked or not.
+ * If it is checked, inner bool deciding what info to paint is set to true.
+ * If not checked, inner bool is set to false.
+ */
 void MapWidget::onToggleStreetNames(bool val)
 {
     if(val) this->streetNamesToggled = true;
@@ -87,6 +105,11 @@ void MapWidget::onToggleStreetNames(bool val)
     update();
 }
 
+/** @brief Handles check of Display Street Info: Names.
+ * @param bool Whether the button is checked or not.
+ * If it is checked, inner bool deciding what info to paint is set to true.
+ * If not checked, inner bool is set to false.
+ */
 void MapWidget::onToggleStreetId(bool val)
 {
     if(val) this->streetIdToggled = true;
@@ -94,6 +117,11 @@ void MapWidget::onToggleStreetId(bool val)
     update();
 }
 
+/** @brief Handles check of Display Street Info: Time to ride through.
+ * @param bool Whether the button is checked or not.
+ * If it is checked, inner bool deciding what info to paint is set to true.
+ * If not checked, inner bool is set to false.
+ */
 void MapWidget::onToggleStreetTime(bool val)
 {
     if(val) this->streetTimeToggled = true;
@@ -101,6 +129,11 @@ void MapWidget::onToggleStreetTime(bool val)
     update();
 }
 
+/** @brief Handles check of Street Color: Time scale.
+ * @param bool Whether the button is checked or not.
+ * If it is checked, inner bool deciding if paint street in time scale colors is set to true.
+ * If not checked, inner bool is set to false.
+ */
 void MapWidget::onToggleColorTime(bool val)
 {
     if(val) this->streetColorTime = true;
@@ -108,6 +141,11 @@ void MapWidget::onToggleColorTime(bool val)
     update();
 }
 
+/** @brief Handles check of Street Color: Time scale.
+ * @param bool Whether the button is checked or not.
+ * If it is checked, inner bool deciding if paint streets in traffic scale colors is set to true.
+ * If not checked, inner bool is set to false.
+ */
 void MapWidget::onToggleColorTraffic(bool val)
 {
     if(val) this->streetColorTraffic = true;
@@ -115,6 +153,9 @@ void MapWidget::onToggleColorTraffic(bool val)
     update();
 }
 
+/** @brief Sets corresponding variables on beggining or ending Closed Street Editor.
+ * @param val Whether the mode was activated or deactivated.
+ */
 void MapWidget::onToggleModifyClosed(bool val)
 {
     //clearing display connection info
@@ -142,6 +183,9 @@ void MapWidget::onToggleModifyClosed(bool val)
     update();
 }
 
+/** @brief Sets corresponding variables on beggining or ending Traffic Editor.
+ * @param val Whether the mode was activated or deactivated.
+ */
 void MapWidget::onToggleModifyTraffic(bool val)
 {
     //clearing display connection info
@@ -165,6 +209,9 @@ void MapWidget::onToggleModifyTraffic(bool val)
     update();
 }
 
+/** @brief Handles Increase/Decrease slider changes in Traffic Editor.
+ * @param val 1 means increasing, 0 decreasing.
+ */
 void MapWidget::onToggleModifyTrafficMode(int val)
 {
     if(val) {
@@ -198,13 +245,11 @@ void MapWidget::onTimeSliderChange(int val)
     update();
 }
 
+/** @brief Finishes closure of a street.
+ * Checks if the closure is valid and if so, stores data about it.
+ */
 void MapWidget::onModifyClosedFinish()
 {
-    //check collected data
-    //if good, call sum denis function
-    //if not, error msg
-    //hide finish button
-    //if good, add closed street to some list
     bool allOK = true;
 
     int startX = closedStreet->x1;
@@ -280,6 +325,8 @@ void MapWidget::onModifyClosedFinish()
     update();
 }
 
+/** @brief Handles Open All Closures button.
+ */
 void MapWidget::onResetAllButtonPress()
 {
     //check if no bus is currently taking detour route
@@ -313,7 +360,7 @@ void MapWidget::onResetAllButtonPress()
 
 //map zoom/pan slot functions ahead
 
-/* @brief Checks if map move arrows should be clickable or not (if the move is possible).
+/** @brief Checks if map move arrows should be clickable or not (if the move is possible).
  */
 void MapWidget::setMapPanButtons()
 {
@@ -329,6 +376,9 @@ void MapWidget::setMapPanButtons()
     else emit allowMapMoveDown(false);
 }
 
+/** @brief Handles changes to map zoom slider.
+ * @param int New value of slider.
+ */
 void MapWidget::onMapZoomChange(int val)
 {
     if(val == zoomLevel) return; //function called from mousewheelevent, where it was already done
@@ -354,6 +404,8 @@ void MapWidget::onMapZoomChange(int val)
     update();
 }
 
+/** @brief Handles press on direction button: right.
+ */
 void MapWidget::onMapMoveRight()
 {
     int viewWidth = 100 - (zoomLevel - 1) * 25;
@@ -366,6 +418,8 @@ void MapWidget::onMapMoveRight()
     update();
 }
 
+/** @brief Handles press on direction button: left.
+ */
 void MapWidget::onMapMoveLeft()
 {
     int viewWidth = 100 - (zoomLevel - 1) * 25;
@@ -377,6 +431,8 @@ void MapWidget::onMapMoveLeft()
     update();
 }
 
+/** @brief Handles press on direction button: up.
+ */
 void MapWidget::onMapMoveUp()
 {
     int viewWidth = 100 - (zoomLevel - 1) * 25;
@@ -388,6 +444,8 @@ void MapWidget::onMapMoveUp()
     update();
 }
 
+/** @brief Handles press on direction button: down.
+ */
 void MapWidget::onMapMoveDown()
 {
     int viewWidth = 100 - (zoomLevel - 1) * 25;
@@ -400,8 +458,12 @@ void MapWidget::onMapMoveDown()
     update();
 }
 
-//end of SLOT functions
-/*@brief Creates message about current state of time and sends it to widget to draw.
+/** @} */
+
+/** @defgroup helpFunc Functions to collect data.*/
+/** @{ */
+
+/** @brief Creates message about current state of time and sends it to widget to draw.
  */
 void MapWidget::createTimerMessage()
 {
@@ -418,6 +480,9 @@ void MapWidget::createTimerMessage()
     emit TimerMessage(msg);
 }
 
+/** @brief Takes times in seconds and creates QString out of it.
+ * @param time Time value to work into message.
+ */
 QString MapWidget::createTimeString(int time)
 {
     int sec = time % 60;
@@ -434,8 +499,9 @@ QString MapWidget::createTimeString(int time)
     return msg;
 }
 
-/* @brief Collects all relevant information about currently clicked connection and writes it on Widget.
+/** @brief Collects all relevant information about currently clicked connection and writes it on Widget.
  * @param connectionElem* Connection to collect information about.
+ * Writes simulation time the data is relevant to. Lists departure time of ev
  */
 void MapWidget::collectConnectionInfo(connectionElem *con)
 {
@@ -456,8 +522,11 @@ void MapWidget::collectConnectionInfo(connectionElem *con)
         if(bus->con == con) {
             any = true;
             msg.append(createTimeString(bus->departure));
-            if(bus->onMap) msg.append("   (x)\n");
-            else msg.append("\n");
+            if(bus->onMap) {
+                msg.append("   (x)");
+                if(bus->returning) msg.append(" (r)");
+            }
+            msg.append("\n");
         }
     }
     if(any == false) msg.append("No buses on this connection.\n");
@@ -553,6 +622,18 @@ void MapWidget::collectConnectionInfo(connectionElem *con)
     showConnectionInfo(true);
 }
 
+/** @} */
+
+/** @defgroup overrides Override functions or functions called only by them.
+ * @{ */
+
+/** @brief Override of paintEvent to include painting all that map displays.
+ * @param QPaintEvent* Information about event.
+ * @see paintStreets(QPainter*)
+ * @see paintCloseModeInfo(QPainter*)
+ * @see paintStreetInfo(QPainter*)
+ * @see paintBuses(QPainter*)
+ */
 void MapWidget::paintEvent(QPaintEvent *event)
 {
     QPainter p(this);
@@ -579,7 +660,9 @@ void MapWidget::paintEvent(QPaintEvent *event)
     event->accept();
 }
 
-/* @brief Help function for paintEvent to draw all streets in color according to flag info
+/** @brief Help function for paintEvent to draw all streets in color according to flag info
+ * @param QPainter* Reference to painter used to draw everything on pan.
+ * @see paintEvent
  */
 void MapWidget::paintStreets(QPainter* p)
 {
@@ -679,7 +762,9 @@ void MapWidget::paintStreets(QPainter* p)
     }
 }
 
-/* @brief Help function for paintEvent to draw all street info if right bool flag is set
+/** @brief Help function for paintEvent to draw all street info if right bool flag is set
+ * @param QPainter* Reference to painter used to draw everything on pan.
+ * @see paintEvent
  */
 void MapWidget::paintStreetInfo(QPainter* p)
 {
@@ -716,7 +801,9 @@ void MapWidget::paintStreetInfo(QPainter* p)
     }
 }
 
-/* @brief Help function for paintEvent to draw all bus positions.
+/** @brief Help function for paintEvent to draw all bus positions.
+ * @param QPainter* Reference to painter used to draw everything on pan.
+ * @see paintEvent
  */
 void MapWidget::paintBuses(QPainter* p)
 {
@@ -748,7 +835,9 @@ void MapWidget::paintBuses(QPainter* p)
     }
 }
 
-/* @brief Help function for paintEvent to draw active bus position.
+/** @brief Help function for paintEvent to draw active bus position.
+ * @param QPainter* Reference to painter used to draw everything on pan.
+ * @see paintEvent
  */
 void MapWidget::paintConnection(QPainter *p)
 {
@@ -820,6 +909,10 @@ void MapWidget::paintConnection(QPainter *p)
     }
 }
 
+/** @brief When in Closed Editor, it handles drawing recently clicked roads to be part of closure.
+ * @param QPainter* Reference to painter used to draw everything on pan.
+ * @see paintEvent
+ */
 void MapWidget::paintCloseModeInfo(QPainter *p)
 {
     QPen base = QPen(Qt::black);
@@ -872,7 +965,8 @@ void MapWidget::paintCloseModeInfo(QPainter *p)
     }
 }
 
-/* @brief Override resizeEvent to ensure the map widget is square after resizing main window.
+/** @brief Override resizeEvent to ensure the map widget is square after resizing main window.
+ * @param QResizeEvent* Reference to object holding all information about the event.
  */
 void MapWidget::resizeEvent(QResizeEvent *event)
 {
@@ -887,7 +981,8 @@ void MapWidget::resizeEvent(QResizeEvent *event)
     QWidget::resizeEvent(event);
 }
 
-/* @brief Override for capturing all mouse clicking inside widget.
+/** @brief Override for capturing all mouse clicking inside widget.
+ * @param QMouseEvent* Reference to object holding all information about the event.
  */
 void MapWidget::mousePressEvent(QMouseEvent *event)
 {
@@ -920,7 +1015,7 @@ void MapWidget::mousePressEvent(QMouseEvent *event)
     update();
 }
 
-/* @brief Function to handle mouse clicks in mode on modifying closed streets.
+/** @brief Function to handle mouse clicks in mode on modifying closed streets.
  * @param x Coordinate X of where mouse was pressed.
  * @param y Coordinate Y of where mouse was pressed.
  */
@@ -975,7 +1070,7 @@ void MapWidget::mouseEventModifyClosed(int x, int y)
     }
 }
 
-/* @brief Function checks if there is street on given coordinates and if so, adjusts traffic level according to current mode.
+/** @brief Function checks if there is street on given coordinates and if so, adjusts traffic level according to current mode.
  * @param x Coordinate X of where mouse was pressed.
  * @param y Coordinate Y of where mouse was pressed.
  */
@@ -1015,7 +1110,7 @@ void MapWidget::mouseEventModifyTraffic(int x, int y)
     }
 }
 
-/* @brief Funciton handles mouse event in view mode. Checks if there is bus under press and shows if connection route if it is.
+/** @brief Funciton handles mouse event in view mode. Checks if there is bus under press and shows if connection route if it is.
  * @param x Coordinate X of where mouse was pressed.
  * @param y Coordinate Y of where mouse was pressed.
  */
@@ -1035,7 +1130,7 @@ void MapWidget::mouseEventNormal(int x, int y)
     }
 }
 
-/* @brief Finds whether street was clicked and if yes, returns its pointer.
+/** @brief Finds whether street was clicked and if yes, returns its pointer.
  * @param x Coordinate X of where mouse was pressed.
  * @param y Coordinate Y of where mouse was pressed.
  * It creates two help lines creating small cross over given point (x, y). Then it uses these lines to
@@ -1058,7 +1153,8 @@ Street* MapWidget::findClickedStreet(int x, int y)
     return nullptr;
 }
 
-/* @brief override of wheel event to use it for zooming in and out
+/** @brief Override of wheel event to use it for zooming in and out.
+ * @param QWheelEvent* Reference to object holding all information about the event.
  */
 void MapWidget::wheelEvent(QWheelEvent *event)
 {
@@ -1094,7 +1190,8 @@ void MapWidget::wheelEvent(QWheelEvent *event)
     update();
 }
 
-/* @brief Function to handle tiding variables after finished map drag.
+/** @brief Function to handle tiding variables after finished map drag.
+ * @param QMouseEvent* Reference to object holding all information about the event.
  */
 void MapWidget::mouseReleaseEvent(QMouseEvent *event)
 {
@@ -1107,7 +1204,8 @@ void MapWidget::mouseReleaseEvent(QMouseEvent *event)
     }
 }
 
-/* @brief Function to handle mouse drag as moving map.
+/** @brief Function to handle mouse drag as moving map.
+ * @param QMouseEvent* Reference to object holding all information about the event.
  */
 void MapWidget::mouseMoveEvent(QMouseEvent *event)
 {
@@ -1136,3 +1234,4 @@ void MapWidget::mouseMoveEvent(QMouseEvent *event)
         return;
     }
 }
+/** @} */

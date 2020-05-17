@@ -1,3 +1,9 @@
+/**
+ * @file connectionHandler.cpp
+ * @author xstrna14, xlebod00
+ * @brief Class for storing information about connections.
+ */
+
 #include "connectionHandler.h"
 #include "backend.h"
 
