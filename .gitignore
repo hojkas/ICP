@@ -1,6 +1,7 @@
 # Vlastní:
 src/build-icp*
 src/icp/icp.pro.user
+doc/
 
 # Vygenerované:
 # Prerequisites

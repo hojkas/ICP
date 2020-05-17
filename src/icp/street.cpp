@@ -29,6 +29,8 @@ AllStreets::AllStreets(QObject *parent) : QObject(parent)
     closed_streets = std::list<Street*>();
 }
 
+/** @brief Returns time to go through street, with traffic taken into account.
+ */
 int Street::count_time()
 {
     return (this->time * this->traffic);
@@ -44,17 +46,21 @@ AllStreets::~AllStreets()
     }
 }
 
+/** @brief Adds street to list of closed streets.
+ */
 void AllStreets::addClosedStreet(Street *s)
 {
     closed_streets.push_back(s);
 }
 
+/** @brief Deletes street from list of closed streets.
+  */
 void AllStreets::removeClosedStreet(Street *s)
 {
     closed_streets.remove(s);
 }
 
-/*
+/**
  * @brief Function loads streets from map file into street_list of this class.
  * TODO fix to take argument name of file
  */
@@ -93,4 +99,3 @@ void AllStreets::loadStreets()
         street_list.push_back(new_street);
      }
 }
-
