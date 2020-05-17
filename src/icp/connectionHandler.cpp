@@ -31,10 +31,11 @@ connectionHandler::~connectionHandler()
 }
 
 /**
- * @brief Creates all connectionElem and busElem objects according to the "../../examples/connections.json" file
- * @param streetList List off all streets on the map
+ * @brief Creates all connectionElem and busElem objects according to the "../../examples/connections.json" file.
+ * @param streetList List off all streets on the map.
+ *
  * When called, loads the contents of the connections.json file and extracts all the information
- * necessary to successfully create all the elements. If any error occours while loading the file or
+ * necessary to successfully create all the elements. If any error occurs while loading the file or
  * parsing the JSON structure, the program is ended with the return code of 1 and an error message is
  * printed in the std::cerr stream.
  */
@@ -105,7 +106,8 @@ void connectionHandler::loadConnections(std::list<Street*> streetList)
  }
 
 /**
- * @brief Prints the IDs of all streets within a connection
+ * @brief Prints the IDs of all streets within a connection.
+ *
  * Mainly for debugging purposes.
  */
 void connectionHandler::printConnections()
@@ -120,7 +122,8 @@ void connectionHandler::printConnections()
     }
 }
 /**
- * @brief Prints the closure status of all streets within a connection
+ * @brief Prints the closure status of all streets within a connection.
+ *
  * Mainly for debugging purposes.
  */
 void connectionHandler::printClosures()
@@ -137,7 +140,8 @@ void connectionHandler::printClosures()
     }
 }
 /**
- * @brief Prints the all the currently active buse
+ * @brief Prints the all the currently active buses.
+ *
  * Mainly for debugging purposes.
  */
 void connectionHandler::printBuses()
@@ -155,6 +159,7 @@ void connectionHandler::printBuses()
  * @param streetIndex Index of the desired street
  * @param next return the next element instead
  * @return tupleElem with currStreet, or if next is true, returns the following tupleElem
+ *
  * First tries to find the element according to the streetIndex position, if no match is found, searches
  * the streetList again, and looks for the first match.
  */
@@ -184,9 +189,10 @@ tupleElem connectionHandler::findStreet(Street* currStreet, tupleList streetList
 }
 
 /**
- * @brief Resets the busElem so it is "ready" to depart again
- * @param bus busElem to reset to default values
- * Resets the busElem so the correct values are set for the next departure
+ * @brief Resets the busElem so it is "ready" to depart again.
+ * @param bus busElem to reset to default values.
+ *
+ * Resets the busElem so the correct values are set for the next departure.
  */
 void connectionHandler::resetBus(busElem* bus)
 {
@@ -201,13 +207,14 @@ void connectionHandler::resetBus(busElem* bus)
 }
 
 /**
- * @brief Updates the position of all busElems
+ * @brief Updates the position of all busElems.
+ *
  * Every call of the busUpdate() function is treated as 30 seconds passing, marked by the
  * secodnsPerTick variable. The function also updates whether a current bus is to be drawn on the map.
- * If the bus is to be displayed, the function takes into account the direction of it's travel, whether
+ * If the bus is to be displayed, the function takes into account the direction of its travel, whether
  * it's on a return route and calculates it's current X and Y coordinates accordingly.
  * It also updates the "curStreet" property of the busElem and calls the resetBus() function when a
- * bus has reached it's final stop.
+ * bus has reached its final stop.
  */
 void connectionHandler::busUpdate(){
     int secondsPerTick = 30;
@@ -273,10 +280,11 @@ void connectionHandler::busUpdate(){
 }
 
 /**
- * @brief The "root" fucntion of creating a closure on a street. Calls the updateClosure() and shortenPath() functions.
- * @param closed Street to be closed
- * @param alternativeStreets Streets to follow instead
- * The function find all connections with the closed street and updates their values accordingly, by
+ * @brief The "root" function of creating a closure on a street. Calls the updateClosure() and shortenPath() functions.
+ * @param closed Street to be closed.
+ * @param alternativeStreets Streets to follow instead.
+ *
+ * The function finds all connections with the closed street and updates their values accordingly, by
  * calling for the updateClosure() and shortenPath() functions.
  */
 void connectionHandler::createClosure(Street* closed, std::list<Street*> alternativeStreets)
