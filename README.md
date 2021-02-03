@@ -1,6 +1,7 @@
 
-Iveta Strnadová (xstrna14)
-Denis Lebó (xlebod00)
+Letní 2019/2020
+
+Body: 70/100
 
 # About
 
