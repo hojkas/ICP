@@ -26,5 +26,7 @@ For buses, each bus contains the departure time in seconds since midnight, denot
 If a fatal error occurs, the application is exited with the following return code.
 
 1 - "connections.json" file is invalid or contains unexpected information
+
 2 - "map.json" file is invalid or contains unexpected information
+
 99 - internal error
